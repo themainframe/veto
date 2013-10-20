@@ -16,30 +16,30 @@ namespace Veto;
  */
 class Veto
 {
-	/**
-	 * Registered routes.
-	 * @var array
-	 */
-	private $routes = array();
+    /**
+     * Registered routes.
+     * @var array
+     */
+    private $routes = array();
 
-	/**
-	 * Map a GET request route to a callable function.
-	 * @return Route
-	 */
-	function get()
-	{
-		return $this;
-	}
+    /**
+     * Map a GET request route to a callable function.
+     * @return Route
+     */
+    function get()
+    {
+        return $this;
+    }
 
-	/**
-	 * Register a route.
-	 * @return Route
-	 */
-	function register()
-	{
-		$route = new Route();
-		$this->routes[] = $route;
+    /**
+     * Register a route.
+     * @return Route
+     */
+    function register()
+    {
+        $route = new Route();
+        $this->routes[] = $route;
 
-		return $route;
-	}
+        return $route;
+    }
 }
