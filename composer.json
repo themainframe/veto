@@ -7,6 +7,9 @@
             "email": "me@damow.net"
         }
     ],
+    "autoload": {
+        "psr-0": { "Veto": "src/" }
+    },
     "require": {
 
     }
