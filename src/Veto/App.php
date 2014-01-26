@@ -13,9 +13,6 @@ namespace Veto;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
-use Veto\Layer\CallbackLayer;
-use Veto\Layer\LOLAppenderLayer;
-use Veto\Layer\RouterLayer;
 
 /**
  * App
@@ -30,6 +27,11 @@ class App
      * @var string
      */
     public $name = 'Veto';
+
+    /**
+     * @var string
+     */
+    public $version = "0.1.1";
 
     /**
      * @var AbstractLayer[]
@@ -64,7 +66,7 @@ class App
         }
 
         // Register the kernel
-        $this->container->registerInstance('app.kernel', $this);
+        $this->container->registerInstance('app', $this);
 
         // Initialise middleware
         foreach ($this->config['layers'] as $layer) {
