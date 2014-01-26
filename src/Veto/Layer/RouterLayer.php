@@ -24,8 +24,8 @@ class RouterLayer extends AbstractLayer
     {
         // TODO: For now, tag the request with a dummy controller
         $request->parameters->add('_controller', array(
-            'class' => 'Controller\\Foo',
-            'method' => 'homeAction'
+            'class' => 'controllers.helloworld',
+            'method' => 'sayHelloAction'
         ));
 
         return $request;

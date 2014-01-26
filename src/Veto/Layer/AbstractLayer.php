@@ -19,6 +19,13 @@ use Veto\HTTP\Response;
  */
 abstract class AbstractLayer
 {
+    protected $container;
+
+    public function setContainer($container)
+    {
+        $this->container = $container;
+    }
+
     public function in(Request $request)
     {
         return $request;

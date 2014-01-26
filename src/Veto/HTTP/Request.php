@@ -33,10 +33,16 @@ class Request
     public $parameters;
 
     /**
+     * @var string
+     */
+    private $token;
+
+    /**
      * Initialise the object.
      */
     public function __construct()
     {
+        $this->token = substr(uniqid(), -6);
         $this->parameters = new Bag();
     }
 
@@ -88,5 +94,13 @@ class Request
     public function getUri()
     {
         return $this->uri;
+    }
+
+    /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
     }
 }
