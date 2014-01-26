@@ -10,6 +10,7 @@
  */
 namespace Veto;
 
+use Veto\DI\Container;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\Layer\CallbackLayer;
@@ -26,19 +27,50 @@ use Veto\Layer\RouterLayer;
 class App
 {
     /**
+     * @var string
+     */
+    public $name = 'Veto';
+
+    /**
      * @var AbstractLayer[]
      */
     private $layers;
 
-    public function __construct()
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * @var array
+     */
+    private $config;
+
+    public function __construct($configPath = '../config/app.json')
     {
-        $this->layers = array();
-        $this->layers[] = new RouterLayer();
-        $this->layers[] = new CallbackLayer(null, function(Response $response) {
-            return $response->setContent(
-                $response->getContent() . ' LOL!'
+        // Read configuration information
+        $configJSON = file_get_contents($configPath);
+        $this->config = json_decode($configJSON, true);
+
+        // Initialise service container
+        $this->container = new Container;
+        foreach ($this->config['services'] as $name => $service) {
+            $this->container->register(
+                $name,
+                $service['class'],
+                isset($service['parameters']) ? $service['parameters'] : array(),
+                isset($service['persistent']) ? $service['persistent'] : false
             );
-        });
+        }
+
+        // Register the kernel
+        $this->container->registerInstance('app.kernel', $this);
+
+        // Initialise middleware
+        foreach ($this->config['layers'] as $layer) {
+            $newLayer = $this->container->get($layer);
+            $this->layers[] = $newLayer;
+        }
     }
 
     /**
@@ -73,7 +105,8 @@ class App
     {
         // Get the controller
         $controllerSpec = $request->parameters->get('_controller');
-        $controller = new $controllerSpec['class'];
+        $controller =  $this->container->get($controllerSpec['class']);
+        $controller->setContainer($this->container);
         return call_user_func(array($controller, $controllerSpec['method']), $request);
     }
 }
