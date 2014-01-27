@@ -60,6 +60,17 @@ class Bag implements \IteratorAggregate
     }
 
     /**
+     * Check if the bag contains a given key
+     *
+     * @param mixed $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return array_key_exists($key, $this->items);
+    }
+
+    /**
      * @return \ArrayIterator
      */
     public function getIterator()
