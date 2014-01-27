@@ -52,7 +52,7 @@ class Bag implements \IteratorAggregate
      */
     public function get($key)
     {
-        if(array_key_exists($key, $this->items)) {
+        if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         } else {
             return null;
