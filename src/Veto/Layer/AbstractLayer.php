@@ -9,6 +9,7 @@
  * @package veto
  */
 namespace Veto\Layer;
+
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 
