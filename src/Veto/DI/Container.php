@@ -51,6 +51,13 @@ class Container
         );
     }
 
+    /**
+     * Locate a service by alias and return an instance of it.
+     *
+     * @param string $alias The alias to look for.
+     * @return object|null
+     * @throws \Exception
+     */
     public function get($alias)
     {
         if (array_key_exists($alias, $this->registeredClasses)) {
