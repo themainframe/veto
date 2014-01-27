@@ -22,11 +22,45 @@ class RouterLayer extends AbstractLayer
 {
     public function in(Request $request)
     {
-        // TODO: For now, tag the request with a dummy controller
-        $request->parameters->add('_controller', array(
-            'class' => 'controllers.helloworld',
-            'method' => 'sayHelloAction'
-        ));
+        // Get the App
+        $app = $this->container->get('app');
+
+        // Check we have routes
+        if (!isset($app->config['routes']) || !count($app->config['routes'])) {
+            throw new \Exception('No routes are defined.');
+        }
+
+        // Match the first route
+        $uri = $request->getUri();
+        $tagged = false;
+
+        foreach ($app->config['routes'] as $routeName => $route) {
+
+            if (!isset($route['url'])) {
+                // Skip routes with no URL
+                continue;
+            }
+
+            if (preg_match('@^' . quotemeta($route['url']) . '$@', $uri, $matches)) {
+
+                // Tag the request with the specified controller
+                $request->parameters->add('_controller', array(
+                    'class' => $route['controller'],
+                    'method' => $route['action']
+                ));
+
+                $tagged = true;
+
+                // Don't attempt to match any more
+                break;
+            }
+
+        }
+
+        // If no suitable route was found...
+        if (!$tagged) {
+            throw new \Exception('No route defined for URL ' . $uri);
+        }
 
         return $request;
     }

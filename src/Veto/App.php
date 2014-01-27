@@ -46,7 +46,7 @@ class App
     /**
      * @var array
      */
-    private $config;
+    public $config;
 
     public function __construct($configPath = '../config/app.json')
     {
@@ -71,6 +71,7 @@ class App
         // Initialise middleware
         foreach ($this->config['layers'] as $layer) {
             $newLayer = $this->container->get($layer);
+            $newLayer->setContainer($this->container);
             $this->layers[] = $newLayer;
         }
     }
