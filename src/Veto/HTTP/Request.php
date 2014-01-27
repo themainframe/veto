@@ -33,6 +33,11 @@ class Request
     public $parameters;
 
     /**
+     * @var Bag
+     */
+    public $query;
+
+    /**
      * @var string
      */
     private $token;
@@ -44,6 +49,7 @@ class Request
     {
         $this->token = substr(uniqid(), -6);
         $this->parameters = new Bag();
+        $this->query = new Bag();
     }
 
     /**
@@ -56,6 +62,16 @@ class Request
         // Select request type
         $this->type = $_SERVER['REQUEST_METHOD'];
         $this->uri = $_SERVER['REQUEST_URI'];
+
+        // Store query string
+        foreach ($_GET as $key => $value) {
+            $this->query->add($key, $value);
+        }
+
+        // Store request parameters
+        foreach ($_POST as $key => $value) {
+            $this->parameters->add($key, $value);
+        }
 
         return $this;
     }
