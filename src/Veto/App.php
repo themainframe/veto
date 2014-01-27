@@ -13,6 +13,7 @@ namespace Veto;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
+use Veto\Layer\AbstractLayer;
 
 /**
  * App
@@ -85,7 +86,7 @@ class App
     public function handle(Request $request)
     {
         // Pass through layers inwards
-        foreach($this->layers as $layer) {
+        foreach ($this->layers as $layer) {
             $request = $layer->in($request);
         }
 
@@ -94,7 +95,7 @@ class App
 
         // Pass through layers back outwards
         $reversedLayers = array_reverse($this->layers);
-        foreach($reversedLayers as $layer) {
+        foreach ($reversedLayers as $layer) {
             $response = $layer->out($response);
         }
 
@@ -110,6 +111,32 @@ class App
         $controllerSpec = $request->parameters->get('_controller');
         $controller =  $this->container->get($controllerSpec['class']);
         $controller->setContainer($this->container);
-        return call_user_func(array($controller, $controllerSpec['method']), $request);
+
+        // Prepare to run the action method
+        $actionMethod = new \ReflectionMethod($controller, $controllerSpec['method']);
+        $parameters = $actionMethod->getParameters();
+        $passedArgs = array();
+
+        foreach ($parameters as $parameter) {
+
+            $hintedClass = $parameter->getClass();
+            $parameterName = $parameter->getName();
+
+            if ($hintedClass) {
+                $hintedClass = $hintedClass->getName();
+            }
+
+            // Special case - should the Request object be passed here?
+            if ($parameterName == 'request' && $hintedClass == 'Veto\HTTP\Request') {
+                $passedArgs[] = $request;
+            }
+
+            // Should a request parameter be passed here?
+            if ($request->parameters->has($parameterName)) {
+                $passedArgs[] = $request->parameters->get($parameterName);
+            }
+        }
+
+        return call_user_func_array(array($controller, $controllerSpec['method']), $passedArgs);
     }
 }
