@@ -35,6 +35,11 @@ class Request
     /**
      * @var Bag
      */
+    public $request;
+
+    /**
+     * @var Bag
+     */
     public $query;
 
     /**
@@ -50,6 +55,7 @@ class Request
         $this->token = substr(uniqid(), -6);
         $this->parameters = new Bag();
         $this->query = new Bag();
+        $this->request = new Bag();
     }
 
     /**
@@ -70,7 +76,7 @@ class Request
 
         // Store request parameters
         foreach ($_POST as $key => $value) {
-            $this->parameters->add($key, $value);
+            $this->request->add($key, $value);
         }
 
         return $this;
