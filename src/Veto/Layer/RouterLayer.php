@@ -35,7 +35,7 @@ class RouterLayer extends AbstractLayer
         // Check if the pattern contains any {...} blocks
         preg_match_all('@{([A-Za-z_]+)}@', $pattern, $placeholders);
 
-        if ($placeholders) {
+        if ($placeholders && $placeholders[1]) {
 
             // Convert all {...} blocks into regex groups
             $pattern = preg_replace('@{[A-Za-z_]+}@', '(.+)', $pattern);
@@ -79,12 +79,13 @@ class RouterLayer extends AbstractLayer
 
         foreach ($app->config['routes'] as $route) {
 
+
             if (!isset($route['url'])) {
                 // Skip routes with no URL
                 continue;
             }
 
-            if ($placeholders = $this->match($uri, $route['url'])) {
+            if (($placeholders = $this->match($uri, $route['url'])) !== false) {
 
                 // Tag the request with the specified controller
                 $request->parameters->add('_controller', array(
