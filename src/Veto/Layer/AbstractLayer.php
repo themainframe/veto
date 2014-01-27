@@ -12,6 +12,7 @@ namespace Veto\Layer;
 
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
+use Veto\DI\Container;
 
 /**
  * AbstractLayer
@@ -20,18 +21,36 @@ use Veto\HTTP\Response;
  */
 abstract class AbstractLayer
 {
+    /**
+     * @var Container
+     */
     protected $container;
 
-    public function setContainer($container)
+    /**
+     * @param Container $container
+     */
+    public function setContainer(Container $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * Pass the request through this layer, in towards the controller.
+     *
+     * @param Request $request
+     * @return Request
+     */
     public function in(Request $request)
     {
         return $request;
     }
 
+    /**
+     * Pass the response through this layer, out away from the controller.
+     *
+     * @param Response $response
+     * @return Response
+     */
     public function out(Response $response)
     {
         return $response;
