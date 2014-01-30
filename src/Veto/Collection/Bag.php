@@ -8,8 +8,8 @@
  * @version 0.1
  * @package veto
  */
+
 namespace Veto\Collection;
-use Traversable;
 
 /**
  * Bag
@@ -76,5 +76,15 @@ class Bag implements \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->items);
+    }
+
+    /**
+     * Get the underlying array of the contents of the bag.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->items;
     }
 }
