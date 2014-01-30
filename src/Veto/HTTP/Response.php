@@ -49,7 +49,7 @@ class Response
      *
      * @param mixed $content
      */
-    public function __construct($content)
+    public function __construct($content = '')
     {
         $this->content = $content;
         $this->headers = new Bag;
