@@ -25,10 +25,12 @@ class Bag implements \IteratorAggregate
 
     /**
      * Initialise the object
+     *
+     * @param array $items Initial items to create the Bag with.
      */
-    public function __construct()
+    public function __construct($items = array())
     {
-        $this->items = array();
+        $this->items = $items;
     }
 
     /**
