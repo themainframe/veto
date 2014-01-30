@@ -45,14 +45,20 @@ class Response
     public $headers;
 
     /**
+     * @var Bag
+     */
+    public $parameters;
+
+    /**
      * Initialise the object
      *
      * @param mixed $content
      */
-    public function __construct($content)
+    public function __construct($content = '')
     {
         $this->content = $content;
         $this->headers = new Bag;
+        $this->parameters = new Bag;
     }
 
     /**
