@@ -49,8 +49,18 @@ class App
      */
     public $config;
 
+    /**
+     * The full path to the directory that contains App.php
+     *
+     * @var string
+     */
+    public $appPath;
+
     public function __construct($configPath = '../config/app.json')
     {
+        // Get app path
+        $this->appPath = dirname(__FILE__);
+
         // Read configuration information
         $configJSON = file_get_contents($configPath);
         $this->config = json_decode($configJSON, true);
@@ -137,6 +147,24 @@ class App
             }
         }
 
-        return call_user_func_array(array($controller, $controllerSpec['method']), $passedArgs);
+        try
+        {
+            // Get the response by calling the controller
+            $response = $actionMethod->invokeArgs($controller, $passedArgs);
+        }
+        catch(\Exception $exception)
+        {
+            $response = $this->handleException($exception);
+        }
+
+        return $response;
+    }
+
+    public function handleException(\Exception $exception)
+    {
+        $exceptionController = new MVC\ExceptionController();
+        $exceptionController->setContainer($this->container);
+
+        return $exceptionController->showExceptionAction($exception);
     }
 }

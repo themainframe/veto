@@ -8,7 +8,10 @@
  * @version 0.1
  * @package veto
  */
+
 namespace Veto\MVC;
+
+use Veto\HTTP\Response;
 
 /**
  * ExceptionController
@@ -18,9 +21,15 @@ namespace Veto\MVC;
  */
 class ExceptionController extends AbstractController
 {
-    public function showExceptionAction(Request $request)
+    public function showExceptionAction($exception)
     {
-        print '<h1>Oops!</h1>' . PHP_EOL;
+        // Is twig available?
+        if ($this->container->has('twig')) {
 
+
+
+        }
+
+        return new Response();
     }
 }

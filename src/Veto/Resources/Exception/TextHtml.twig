@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exception</title>
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        * { font-family: "pt sans", sans-serif; }
+
+        header {
+            font-weight: bold;
+            margin: 0px 0px 30px 0px;
+            font-size: 300%;
+            text-align: center;
+        }
+
+        body,html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Oops.
+    </header>
+
+    <p>
+        <strong>
+            {{ exception.getMessage() }}
+        </strong>
+    </p>
+
+    <p>
+        Oops!
+    </p>
+
+</body>
+</html>
