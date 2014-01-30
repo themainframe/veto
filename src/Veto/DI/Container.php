@@ -52,6 +52,17 @@ class Container
     }
 
     /**
+     * Check if a service exists by alias.
+     *
+     * @param string $alias The alias to look for.
+     * @return boolean
+     */
+    public function has($alias)
+    {
+        return array_key_exists($alias, $this->registeredClasses);
+    }
+
+    /**
      * Locate a service by alias and return an instance of it.
      *
      * @param string $alias The alias to look for.
