@@ -30,14 +30,14 @@ class Container
      * @param string $alias The name for the service.
      * @param string $className The absolute class name.
      * @param array $params Optionally any parameters to pass to the constructor.
-     * @param bool $persist Optionally return the same instance every time the service is requested.
+     * @param bool $oneShot Optionally return a new instance every time the service is located.
      */
-    public function register($alias, $className, $params = array(), $persist = false)
+    public function register($alias, $className, $params = array(), $oneShot = true)
     {
         $this->registeredClasses[$alias] = array(
             'className' => $className,
             'parameters' => $params,
-            'isPersistent' => $persist
+            'isOneShot' => $oneShot
         );
     }
 
@@ -51,7 +51,7 @@ class Container
     {
         $this->registeredClasses[$alias] = array(
             'className' => get_class($instance),
-            'isPersistent' => true,
+            'isOneShot' => false,
             'instance' => $instance
         );
     }
@@ -69,8 +69,8 @@ class Container
 
             $definition = $this->registeredClasses[$alias];
 
-            // Use the persisted instance?
-            if ($definition['isPersistent'] && isset($definition['instance'])) {
+            // Should a new instance be returned every time?
+            if (!$definition['isOneShot'] && isset($definition['instance'])) {
                 return $definition['instance'];
             }
 
@@ -90,8 +90,8 @@ class Container
             $reflectionClass = new \ReflectionClass($className);
             $instance = $reflectionClass->newInstanceArgs($parameters);
 
-            // Persist?
-            if ($definition['isPersistent']) {
+            // Persist, or one-shot instance?
+            if (!$definition['isOneShot']) {
                 $this->registeredClasses[$alias]['instance'] =
                     $instance;
             }
