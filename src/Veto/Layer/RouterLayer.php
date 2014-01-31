@@ -35,16 +35,16 @@ class RouterLayer extends AbstractLayer
         // Check if the pattern contains any {...} blocks
         preg_match_all('@{([A-Za-z_]+)}@', $pattern, $placeholders);
 
-        if ($placeholders && $placeholders[1]) {
+        if ($placeholders && isset($placeholders[1])) {
 
             // Convert all {...} blocks into regex groups
-            $pattern = preg_replace('@{[A-Za-z_]+}@', '(.+)', $pattern);
+            $pattern = preg_replace('@{[A-Za-z_]+}@', '([^/]+)', $pattern);
 
             // Get the placeholder names
             $placeholders = $placeholders[1];
 
             // See if the route matches
-            if (preg_match('@' . $pattern . '@', $uri, $matches)) {
+            if (preg_match('@^' . $pattern . '$@', $uri, $matches)) {
                 // Merge the placeholder names with their URI values
                 array_shift($matches);
                 return array_combine($placeholders, $matches);
