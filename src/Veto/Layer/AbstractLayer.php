@@ -10,30 +10,17 @@
  */
 namespace Veto\Layer;
 
+use Veto\DI\AbstractContainerAccessor;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
-use Veto\DI\Container;
 
 /**
  * AbstractLayer
  *
  * @since 0.1
  */
-abstract class AbstractLayer
+abstract class AbstractLayer extends AbstractContainerAccessor
 {
-    /**
-     * @var Container
-     */
-    protected $container;
-
-    /**
-     * @param Container $container
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * Pass the request through this layer, in towards the controller.
      *

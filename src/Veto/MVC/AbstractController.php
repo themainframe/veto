@@ -10,27 +10,16 @@
  */
 namespace Veto\MVC;
 
+use Veto\DI\AbstractContainerAccessor;
+
 /**
  * Controller
  * Tags requests for the kernel to dispatch to controllers.
  *
  * @since 0.1
  */
-class AbstractController
+class AbstractController extends AbstractContainerAccessor
 {
-    /**
-     * @var \Veto\DI\Container
-     */
-    protected $container;
-
-    /**
-     * @param \Veto\DI\Container $container
-     */
-    public function setContainer($container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * @return \Veto\DI\Container
      */

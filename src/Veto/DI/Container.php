@@ -17,6 +17,11 @@ namespace Veto\DI;
  */
 class Container
 {
+    /**
+     * The underlying associative array of services managed by this container.
+     *
+     * @var array
+     */
     private $registeredClasses = array();
 
     /**
