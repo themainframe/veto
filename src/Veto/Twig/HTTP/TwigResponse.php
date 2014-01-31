@@ -14,8 +14,8 @@ use Veto\Collection\Bag;
 use Veto\HTTP\Response;
 
 /**
- * TwigLayer
- * Renders templates using twig.
+ * TwigResponse
+ * A response that can be processed by a TwigLayer.
  *
  * @since 0.1
  */
