@@ -10,6 +10,7 @@
  */
 namespace Veto;
 
+use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
@@ -22,7 +23,7 @@ use Veto\Layer\AbstractLayer;
  *
  * @since 0.1
  */
-class App
+class App extends AbstractContainerAccessor
 {
     /**
      * @var string
@@ -40,15 +41,15 @@ class App
     private $layers;
 
     /**
-     * @var Container
-     */
-    private $container;
-
-    /**
      * @var array
      */
     public $config;
 
+    /**
+     * Create a new application instance.
+     *
+     * @param string $configPath The path to the JSON configuration file.
+     */
     public function __construct($configPath = '../config/app.json')
     {
         // Read configuration information
@@ -57,23 +58,65 @@ class App
 
         // Initialise service container
         $this->container = new Container;
-        foreach ($this->config['services'] as $name => $service) {
-            $this->container->register(
-                $name,
-                $service['class'],
-                isset($service['parameters']) ? $service['parameters'] : array(),
-                isset($service['persistent']) ? $service['persistent'] : false
-            );
-        }
 
         // Register the kernel
         $this->container->registerInstance('app', $this);
 
+        // Register services
+        $this->registerServices(
+            isset($this->config['services']) ? $this->config['services'] : array()
+        );
+
         // Initialise middleware
-        foreach ($this->config['layers'] as $layer) {
+        $this->registerLayers(
+            isset($this->config['layers']) ? $this->config['layers'] : array()
+        );
+    }
+
+    /**
+     * Recursively register an array of services as presented in the configuration JSON.
+     *
+     * @param array $services The services to register
+     * @param string $namespace The namespace under which to register services
+     */
+    private function registerServices(array $services, $namespace = '')
+    {
+        foreach ($services as $name => $element) {
+
+            if (isset($element['class'])) {
+
+                // This is a service definition
+                $this->container->register(
+                    $namespace . ($namespace ? '.' : '') . $name,
+                    $element['class'],
+                    isset($element['parameters']) ? $element['parameters'] : array(),
+                    isset($element['persistent']) ? $element['persistent'] : false
+                );
+
+            } else {
+
+                // This is an array of services in a namespace
+                $this->registerServices(
+                    $element,
+                    $namespace . ($namespace ? '.' : '') . $name
+                );
+
+            }
+        }
+    }
+
+    /**
+     * Register an array of layers as presented in the configuration JSON.
+     *
+     * @param array $layers The layers to register
+     */
+    private function registerLayers(array $layers)
+    {
+        foreach ($layers as $layerName => $layer)
+        {
             $newLayer = $this->container->get($layer);
             $newLayer->setContainer($this->container);
-            $this->layers[] = $newLayer;
+            $this->layers[$layerName] = $newLayer;
         }
     }
 
@@ -137,6 +180,9 @@ class App
             }
         }
 
-        return call_user_func_array(array($controller, $controllerSpec['method']), $passedArgs);
+        // Get the response by calling the controller
+        $response = $actionMethod->invokeArgs($controller, $passedArgs);
+
+        return $response;
     }
 }
