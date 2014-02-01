@@ -60,9 +60,14 @@ class App extends AbstractContainerAccessor
      */
     public function __construct($configPath = '../config/app.json')
     {
+        // Set the base directory
+        $this->path = dirname(__DIR__);
+
+        // Load the base configuration
+        $this->loadConfig($this->path . '/../config/base.json');
+
         // Read configuration information
-        $configJSON = file_get_contents($configPath);
-        $this->config = json_decode($configJSON, true);
+        $this->loadConfig($configPath);
 
         // Initialise service container
         $this->container = new Container;
@@ -79,6 +84,37 @@ class App extends AbstractContainerAccessor
         $this->registerLayers(
             isset($this->config['layers']) ? $this->config['layers'] : array()
         );
+    }
+
+    /**
+     * Load application configuration data from a JSON file.
+     *
+     * By default, the contents will be merged with the current configuration.
+     * Any changes will overwrite the current values.
+     *
+     * @param string $configPath The path to the JSON configuration file.
+     * @param bool $replace Optionally replace the application configuration. Default false.
+     */
+    public function loadConfig($configPath, $replace = false)
+    {
+        $configJSON = file_get_contents($configPath);
+        $config = json_decode($configJSON, true);
+
+
+        if ($replace) {
+
+            // Replace the configuration hive with this file
+            $this->config = $config;
+
+        } else {
+
+            // Merge the configuration hive with this file
+            $this->config = array_replace_recursive(
+                $this->config,
+                $config
+            );
+
+        }
     }
 
     /**
