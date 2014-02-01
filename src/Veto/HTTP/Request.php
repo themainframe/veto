@@ -10,12 +10,13 @@
  */
 namespace Veto\HTTP;
 use Veto\Collection\Bag;
+use Veto\Layer\Passable;
 
 /**
  * Request
  * @since 0.1
  */
-class Request
+class Request extends Passable
 {
     /**
      * @var string

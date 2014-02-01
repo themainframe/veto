@@ -11,13 +11,14 @@
 namespace Veto\HTTP;
 
 use Veto\Collection\Bag;
+use Veto\Layer\Passable;
 
 /**
  * Response
  *
  * @since 0.1
  */
-class Response
+class Response extends Passable
 {
     /**
      * @var string
