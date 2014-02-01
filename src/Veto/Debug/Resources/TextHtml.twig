@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exception</title>
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+
+        body,html {
+            font-family: "pt sans", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0px 0px 20px 0px;
+            font-size: 200%;
+        }
+
+        h2 {
+            font-size: 120%;
+            margin: 0px 0px 20px 0px;
+        }
+
+        div.stack {
+            font-family: monospace;
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid #efefef;
+            border-radius: 6px;
+        }
+
+        span.line {
+            width: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        span.grey {
+            font-family: inherit;
+            color: #afafaf;
+        }
+
+    </style>
+</head>
+<body>
+    <h1><span class="grey">{{ code }}</span> &nbsp; {{ message }}</h1>
+    <div class="stack">
+
+        <strong>{{ type }}</strong> thrown at:
+
+        <br><br>
+
+        {% for frame in trace %}
+            line <strong>{{ frame['line'] ?: '??' }}</strong> of {{ frame['file'] }}
+            <br>
+            {{ frame['class'] ?: '' }} {{ frame['type'] ?: '' }} {{ frame['function'] }}()
+
+            {% if loop.index0 == 0 %}
+            <br><br><span class="grey">... which was called by...</span>
+            {% endif %}
+
+            <br><br>
+        {% endfor %}
+    </div>
+</body>
+</html>
