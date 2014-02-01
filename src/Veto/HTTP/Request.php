@@ -30,6 +30,11 @@ class Request extends Passable
     private $uri;
 
     /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
      * @var Bag
      */
     public $parameters;
@@ -38,6 +43,13 @@ class Request extends Passable
      * @var Bag
      */
     public $request;
+
+    /**
+     * The server variables.
+     *
+     * @var Bag
+     */
+    public $server;
 
     /**
      * @var Bag
@@ -58,6 +70,7 @@ class Request extends Passable
         $this->parameters = new Bag();
         $this->query = new Bag();
         $this->request = new Bag();
+        $this->server = new Bag();
     }
 
     /**
@@ -69,7 +82,6 @@ class Request extends Passable
     {
         // Select request type
         $this->type = $_SERVER['REQUEST_METHOD'];
-        $this->uri = $_SERVER['REQUEST_URI'];
 
         // Store query string
         foreach ($_GET as $key => $value) {
@@ -81,7 +93,57 @@ class Request extends Passable
             $this->request->add($key, $value);
         }
 
+        // Store the server variables
+        foreach ($_SERVER as $key => $value) {
+            $this->server->add($key, $value);
+        }
+
+        $this->baseUrl = $this->determineBaseUrl();
+        $this->uri = substr_replace(
+            $this->server->get('REQUEST_URI'),
+            '',
+            0,
+            strlen($this->baseUrl)
+        );
+
         return $this;
+    }
+
+    /**
+     * Determine the Base URL of the request.
+     *
+     * @todo Massive assumptions made about platform here. Review.
+     * @return string
+     */
+    private function determineBaseUrl()
+    {
+        // Get the filename of the current script
+        $basePath = $this->server->get('SCRIPT_NAME');
+        $requestUrl = $this->server->get('REQUEST_URI');
+        $baseUrl = '';
+
+        // Trim both strings to the shortest length
+        $length = min(strlen($basePath), strlen($requestUrl));
+        $basePath = substr($basePath, 0, $length);
+        $requestUrl = substr($requestUrl, 0, $length);
+
+        // The common characters of the basePath and requestUrl are the baseUrl
+        for ($c = 0; $c < strlen($basePath); $c ++) {
+
+            if ($basePath[$c] != $requestUrl[$c]) {
+               break;
+            }
+
+            $baseUrl .= $basePath[$c];
+        }
+
+        // Remove the trailing / if it exists
+        if (substr($baseUrl, -1) == '/')
+        {
+            $baseUrl = substr($baseUrl, 0, -1);
+        }
+
+        return $baseUrl;
     }
 
     /**
@@ -126,5 +188,21 @@ class Request extends Passable
     public function getToken()
     {
         return $this->token;
+    }
+
+    /**
+     * @param string $baseUrl
+     */
+    public function setBaseUrl($baseUrl)
+    {
+        $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->baseUrl;
     }
 }
