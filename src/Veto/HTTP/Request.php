@@ -9,6 +9,7 @@
  * @package veto
  */
 namespace Veto\HTTP;
+
 use Veto\Collection\Bag;
 use Veto\Layer\Passable;
 
