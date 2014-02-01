@@ -22,7 +22,7 @@ class Container
      *
      * @var array
      */
-    private $registeredClasses = array();
+    public $registeredClasses = array();
 
     /**
      * Register a service in the container.
@@ -76,16 +76,7 @@ class Container
 
             $parameterAliases = $definition['parameters'];
             $className = $definition['className'];
-            $parameters = array();
-
-            foreach ($parameterAliases as $parameterAlias) {
-                if (is_string($parameterAlias) && $parameterAlias[0] == '@') {
-                    $parameterAlias = substr($parameterAlias, 1);
-                    $parameters[] = $this->get($parameterAlias);
-                } else {
-                    $parameters[] = $parameterAlias;
-                }
-            }
+            $parameters = $this->resolveParameterAliases($parameterAliases);
 
             $reflectionClass = new \ReflectionClass($className);
             $instance = $reflectionClass->newInstanceArgs($parameters);
@@ -98,8 +89,50 @@ class Container
 
             return $instance;
 
+        } else if(substr($alias, -2) === '.*') {
+
+            $matchedServices = $this->getNamespace(substr($alias, 0, -1));
+            $services = array();
+
+
+            foreach($matchedServices as $serviceAlias => $service) {
+                $services[] = $this->get($serviceAlias);
+            }
+
+            return $services;
+
         } else {
             throw new \Exception('Unknown DI alias ' . $alias);
         }
+    }
+
+    private function getNamespace($namespace)
+    {
+        // Get all the services under a namespace
+        $matches = array();
+
+        foreach ($this->registeredClasses as $alias => $service) {
+            if (strpos($alias, $namespace) === 0) {
+                $matches[$alias] = $service;
+            }
+        }
+
+        return $matches;
+    }
+
+    private function resolveParameterAliases($parameters)
+    {
+        foreach ($parameters as & $parameter) {
+            if (is_array($parameter)) {
+                $parameter = $this->resolveParameterAliases($parameter);
+            } else {
+                if (is_string($parameter) && $parameter[0] == '@') {
+                    $parameter = substr($parameter, 1);
+                    $parameter = $this->get($parameter);
+                }
+            }
+        }
+
+        return $parameters;
     }
 }

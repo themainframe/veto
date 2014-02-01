@@ -22,6 +22,7 @@ use Veto\HTTP\Response;
 class TwigResponse extends Response
 {
     protected $template;
+    protected $templatePath;
 
     public function __construct($template, $parameters = array())
     {
@@ -29,6 +30,22 @@ class TwigResponse extends Response
 
         $this->template = $template;
         $this->parameters = new Bag($parameters);
+    }
+
+    /**
+     * @param string $templatePath
+     */
+    public function setTemplatePath($templatePath)
+    {
+        $this->templatePath = $templatePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplatePath()
+    {
+        return $this->templatePath;
     }
 
     /**
