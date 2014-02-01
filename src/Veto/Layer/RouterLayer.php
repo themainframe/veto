@@ -107,7 +107,7 @@ class RouterLayer extends AbstractLayer
 
         // If no suitable route was found...
         if (!$tagged) {
-            throw new \Exception('No route defined for URL ' . $uri);
+            throw new \Exception('No route defined for ' . $request->getType() . ' ' . $uri, 404);
         }
 
         return $request;

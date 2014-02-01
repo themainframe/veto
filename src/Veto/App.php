@@ -172,17 +172,39 @@ class App extends AbstractContainerAccessor
      */
     public function handle(Request $request)
     {
-        // Pass through layers inwards
-        foreach ($this->layers as $layer) {
-            $request = $layer->in($request);
-        }
+        try {
 
-        // Dispatch the request
-        $response = $this->dispatch($request);
+            // Pass through layers inwards
+            foreach ($this->layers as $layer) {
+
+                if ($request->getSkipAll()) {
+                    break;
+                }
+
+                $request = $layer->in($request);
+            }
+
+            // Dispatch the request
+            $response = $this->dispatch($request);
+
+
+        } catch(\Exception $exception) {
+
+            // Invoke the exception controller action method
+            $exceptionHandler = $this->container->get('controller._exception_handler');
+            $exceptionHandler->setContainer($this->container);
+            $response = $exceptionHandler->handleExceptionAction($request, $exception);
+
+        }
 
         // Pass through layers back outwards
         $reversedLayers = array_reverse($this->layers);
         foreach ($reversedLayers as $layer) {
+
+            if ($response->getSkipAll()) {
+                break;
+            }
+
             $response = $layer->out($response);
         }
 
@@ -224,7 +246,6 @@ class App extends AbstractContainerAccessor
             }
         }
 
-        // Get the response by calling the controller
         $response = $actionMethod->invokeArgs($controller, $passedArgs);
 
         return $response;
