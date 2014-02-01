@@ -43,7 +43,15 @@ class App extends AbstractContainerAccessor
     /**
      * @var array
      */
-    public $config;
+    public $config = array();
+
+    /**
+     * The base path of the application.
+     * Resolves to the directory that contains the kernel class file (App.php).
+     *
+     * @var string
+     */
+    public $path;
 
     /**
      * Create a new application instance.
