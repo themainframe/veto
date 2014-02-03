@@ -56,6 +56,62 @@ class RouterLayer extends AbstractLayer
     }
 
     /**
+     * Generate a URL from a route name and parameter set.
+     *
+     * @param string $routeName The route name to use.
+     * @param array $parameters Optionally the parameters to use.
+     * @throws \Exception
+     * @return string|boolean The URL on success, false on failure.
+     */
+    public function generateUrl($routeName, array $parameters = array())
+    {
+        // Get the App
+        $app = $this->container->get('app');
+
+        // Check we have routes
+        if (!isset($app->config['routes']) || !count($app->config['routes'])) {
+            throw new \Exception('No routes are defined.');
+        }
+
+        // Get the route
+        if (!array_key_exists($routeName, $app->config['routes'])) {
+            throw new \Exception('Cannot generate URL for non-existent route "' . $routeName . '"');
+        }
+        $route = $app->config['routes'][$routeName];
+
+        // Ensure the route has a URL
+        if (!isset($route['url'])) {
+            throw new \Exception('Route "' . $routeName . '" must have a "url" property.');
+        }
+        $url = $route['url'];
+
+        // Get each of the {...} blocks in the URL
+        preg_match_all('@{([A-Za-z_]+)}@', $url, $placeholders);
+
+        // If no parameters need substituting...
+        if (!isset($placeholders[1])) {
+            // Simply return the URL
+            return $url;
+        }
+
+        // Swap all the parameters
+        foreach ($placeholders[1] as $placeholder) {
+
+            if (!array_key_exists($placeholder, $parameters)) {
+                throw new \Exception(
+                    'Parameter "' . $placeholder . '" must be specified to ' .
+                    'generate URL for route "' . $routeName . '"'
+                );
+            }
+
+            // Replace it with the value from the array
+            $url = str_replace('{' . $placeholder . '}', $parameters[$placeholder], $url);
+        }
+
+        return $url;
+    }
+
+    /**
      * Tag a request $request with a controller so that the kernel (Veto\App)
      * can dispatch it to a controller.
      *
