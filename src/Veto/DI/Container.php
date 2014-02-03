@@ -22,7 +22,7 @@ class Container
      *
      * @var array
      */
-    public $registeredClasses = array();
+    protected $registeredClasses = array();
 
     /**
      * Register a service in the container.
