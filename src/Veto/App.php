@@ -187,6 +187,19 @@ class App extends AbstractContainerAccessor
             // Dispatch the request
             $response = $this->dispatch($request);
 
+            // Pass through layers back outwards
+            $reversedLayers = array_reverse($this->layers);
+            foreach ($reversedLayers as $layer) {
+
+                if ($response->getSkipAll()) {
+                    break;
+                }
+
+                $response = $layer->out($response);
+            }
+
+            // Output content
+            $response->send();
 
         } catch(\Exception $exception) {
 
@@ -196,20 +209,6 @@ class App extends AbstractContainerAccessor
             $response = $exceptionHandler->handleExceptionAction($request, $exception);
 
         }
-
-        // Pass through layers back outwards
-        $reversedLayers = array_reverse($this->layers);
-        foreach ($reversedLayers as $layer) {
-
-            if ($response->getSkipAll()) {
-                break;
-            }
-
-            $response = $layer->out($response);
-        }
-
-        // Output content
-        $response->send();
 
         return $response;
     }
