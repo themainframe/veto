@@ -44,7 +44,11 @@
     </style>
 </head>
 <body>
-    <h1><span class="grey">{{ code }}</span> &nbsp; {{ message }}</h1>
+    <h1>
+        {% if code > 0 %}<span class="grey">{{ code }}</span>
+        &nbsp; {% endif %}
+        {{ message }}
+    </h1>
     <div class="stack">
 
         <strong>{{ type }}</strong> thrown at:
