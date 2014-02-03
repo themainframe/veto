@@ -32,4 +32,9 @@ class AbstractController extends AbstractContainerAccessor
     {
         return $this->container->get($serviceName);
     }
+
+    public function render($templateName, array $parameters = array())
+    {
+        return $this->get('templating')->render($templateName, $parameters);
+    }
 }
