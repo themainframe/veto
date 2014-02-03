@@ -1,19 +1,5 @@
 {
     "services": {
-
-        "twig": {
-
-            "environment": {
-                "class": "\\Twig_Environment",
-                "parameters": ["@twig.loader", []]
-            },
-
-            "loader": {
-                "class": "\\Twig_Loader_Chain",
-                "parameters": ["@twig.loaders.*"]
-            }
-        },
-
         "controller": {
             "_exception_handler": {
                 "class": "\\Veto\\Debug\\Controller\\ExceptionController",

@@ -11,6 +11,7 @@
 namespace Veto\Debug\Controller;
 
 use Veto\HTTP\Request;
+use Veto\HTTP\Response;
 use Veto\MVC\AbstractController;
 use Veto\Twig\HTTP\TwigResponse;
 
@@ -29,7 +30,16 @@ class ExceptionController extends AbstractController
 {
     public function handleExceptionAction(Request $request, \Exception $exception)
     {
-        $response = new TwigResponse('TextHtml.twig', array(
+        // The templates for showing exceptions are outside of the normal application
+        // template path. It is therefore necessary to specify the path here.
+
+        // TODO: Improve this mechanic.
+        $this->get('templating')->addPath(
+            $this->get('app')->path . '/Veto/Debug/Resources/'
+        );
+
+        // Render the template
+        $response = $this->get('templating')->render('TextHtml.twig', array(
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
@@ -38,8 +48,6 @@ class ExceptionController extends AbstractController
             'type' => get_class($exception)
         ));
 
-        $response->setTemplatePath($this->get('app')->path . '/Veto/Debug/Resources/');
-
-        return $response;
+        return new Response($response);
     }
 }

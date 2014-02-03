@@ -134,7 +134,7 @@ class App extends AbstractContainerAccessor
                     $namespace . ($namespace ? '.' : '') . $name,
                     $element['class'],
                     isset($element['parameters']) ? $element['parameters'] : array(),
-                    isset($element['one_shot']) ? $element['one_shot'] : true
+                    isset($element['one_shot']) ? $element['one_shot'] : false
                 );
 
             } else {
