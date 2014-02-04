@@ -42,7 +42,7 @@ class Container
     }
 
     /**
-     * Register an existing instace in the container.
+     * Register an existing instance in the container.
      *
      * @param string $alias The name for the service.
      * @param mixed $instance The existing object.
