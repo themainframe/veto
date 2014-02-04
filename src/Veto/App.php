@@ -198,17 +198,16 @@ class App extends AbstractContainerAccessor
                 $response = $layer->out($response);
             }
 
-            // Output content
-            $response->send();
-
         } catch(\Exception $exception) {
 
             // Invoke the exception controller action method
             $exceptionHandler = $this->container->get('controller._exception_handler');
             $exceptionHandler->setContainer($this->container);
             $response = $exceptionHandler->handleExceptionAction($request, $exception);
-
         }
+
+        // Output content
+        $response->send();
 
         return $response;
     }
@@ -219,6 +218,14 @@ class App extends AbstractContainerAccessor
         $controllerSpec = $request->parameters->get('_controller');
         $controller =  $this->container->get($controllerSpec['class']);
         $controller->setContainer($this->container);
+
+        if (!method_exists($controller, $controllerSpec['method'])) {
+            throw new \Exception(
+                'The controller action "' . $controllerSpec['method'] .
+                '" does not exist for controller "' .
+                $controllerSpec['class'] . '".'
+            );
+        }
 
         // Prepare to run the action method
         $actionMethod = new \ReflectionMethod($controller, $controllerSpec['method']);
