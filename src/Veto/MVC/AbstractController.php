@@ -11,6 +11,7 @@
 namespace Veto\MVC;
 
 use Veto\DI\AbstractContainerAccessor;
+use Veto\HTTP\Response;
 
 /**
  * Controller
@@ -35,6 +36,8 @@ class AbstractController extends AbstractContainerAccessor
 
     public function render($templateName, array $parameters = array())
     {
-        return $this->get('templating')->render($templateName, $parameters);
+        return new Response(
+            $this->get('templating')->render($templateName, $parameters)
+        );
     }
 }
