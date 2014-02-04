@@ -11,6 +11,5 @@
         "psr-0": { "Veto": "src/" }
     },
     "require": {
-        "twig/twig" : "1.*"
     }
 }
