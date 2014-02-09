@@ -22,7 +22,7 @@ class Request extends Passable
     /**
      * @var string
      */
-    private $type;
+    private $method;
 
     /**
      * @var string
@@ -81,7 +81,7 @@ class Request extends Passable
     public function initWithGlobals()
     {
         // Select request type
-        $this->type = $_SERVER['REQUEST_METHOD'];
+        $this->method = $_SERVER['REQUEST_METHOD'];
 
         // Store query string
         foreach ($_GET as $key => $value) {
@@ -147,21 +147,21 @@ class Request extends Passable
     }
 
     /**
-     * @param string $type
+     * @param string $method
      * @return $this
      */
-    public function setType($type)
+    public function setMethod($method)
     {
-        $this->type = $type;
+        $this->method = $method;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getType()
+    public function getMethod()
     {
-        return $this->type;
+        return $this->method;
     }
 
     /**
