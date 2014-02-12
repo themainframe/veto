@@ -15,6 +15,7 @@ use Veto\Collection\Bag;
 use Veto\HTTP\Request;
 use Veto\Layer\AbstractLayer;
 use Veto\Layer\LayerInterface;
+use Veto\Exception\ConfigurationException;
 
 /**
  * RouterLayer
@@ -35,7 +36,7 @@ class RouterLayer extends AbstractLayer implements LayerInterface
     {
         $this->routes = new Bag();
 
-        if (!array_key_exists('routes', $app->config) ||
+        if (!$app->config->get('routes') ||
             !is_array($app->config['routes'])) {
             throw ConfigurationException::missingKey('routes');
         }

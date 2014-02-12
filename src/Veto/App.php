@@ -10,6 +10,7 @@
  */
 namespace Veto;
 
+use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
@@ -41,7 +42,12 @@ class App extends AbstractContainerAccessor
     private $layers;
 
     /**
-     * @var array
+     * @var Tree
+     */
+    public $parameters;
+
+    /**
+     * @var Hive
      */
     public $config = array();
 
@@ -58,21 +64,25 @@ class App extends AbstractContainerAccessor
      *
      * @param string $configPath The path to the JSON configuration file.
      */
-    public function __construct($configPath = '../config/app.json')
+    public function __construct($configPath)
     {
         // Set the base directory
         $this->path = dirname(__DIR__);
 
+        // Create the configuration hive and load the base config
+        $this->config = new Hive;
+
         // Load the base configuration
-        $this->loadConfig($this->path . '/../config/base.json');
+        $this->config->loadJson($this->path . '/../config/base.json');
 
         // Read configuration information
-        $this->loadConfig($configPath);
+        $this->config->loadJson($configPath);
 
         // Initialise service container
         $this->container = new Container;
 
-        // Register the kernel
+        // Register the kernel & configuration hive
+        $this->container->registerInstance('config', $this->config);
         $this->container->registerInstance('app', $this);
 
         // Register services
@@ -84,37 +94,6 @@ class App extends AbstractContainerAccessor
         $this->registerLayers(
             isset($this->config['layers']) ? $this->config['layers'] : array()
         );
-    }
-
-    /**
-     * Load application configuration data from a JSON file.
-     *
-     * By default, the contents will be merged with the current configuration.
-     * Any changes will overwrite the current values.
-     *
-     * @param string $configPath The path to the JSON configuration file.
-     * @param bool $replace Optionally replace the application configuration. Default false.
-     */
-    public function loadConfig($configPath, $replace = false)
-    {
-        $configJSON = file_get_contents($configPath);
-        $config = json_decode($configJSON, true);
-
-
-        if ($replace) {
-
-            // Replace the configuration hive with this file
-            $this->config = $config;
-
-        } else {
-
-            // Merge the configuration hive with this file
-            $this->config = array_replace_recursive(
-                $this->config,
-                $config
-            );
-
-        }
     }
 
     /**
