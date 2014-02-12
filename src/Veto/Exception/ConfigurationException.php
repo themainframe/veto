@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\Layer\Router;
+namespace Veto\Exception;
 
 use Veto\App;
 use Veto\Collection\Bag;
@@ -27,6 +27,15 @@ class ConfigurationException extends \Exception
 {
     public static function missingKey($expectedKey)
     {
-        return new self(sprintf('Key %s must be specified in the application configuration.'));
+        return new self(
+            sprintf('Key "%s" must be specified in the application configuration.', $expectedKey)
+        );
+    }
+
+    public static function missingImportedFile($file, $importedFrom)
+    {
+        return new self(
+            sprintf('File %s (imported from %s) does not exist.', $file, $importedFrom)
+        );
     }
 }
