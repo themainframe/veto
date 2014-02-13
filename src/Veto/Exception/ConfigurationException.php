@@ -10,12 +10,6 @@
  */
 namespace Veto\Exception;
 
-use Veto\App;
-use Veto\Collection\Bag;
-use Veto\HTTP\Request;
-use Veto\Layer\AbstractLayer;
-use Veto\Layer\LayerInterface;
-
 /**
  * ConfigurationException
  *
