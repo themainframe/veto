@@ -60,7 +60,7 @@
             <br>
             {{ frame['class'] ?: '' }} {{ frame['type'] ?: '' }} {{ frame['function'] }}()
 
-            {% if loop.index0 == 0 %}
+            {% if loop.index0 == 0 and trace|length > 1 %}
             <br><br><span class="grey">... which was called by...</span>
             {% endif %}
 
