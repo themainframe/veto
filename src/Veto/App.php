@@ -13,6 +13,7 @@ namespace Veto;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
+use Veto\Exception\ConfigurationException;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\Layer\AbstractLayer;
@@ -131,14 +132,28 @@ class App extends AbstractContainerAccessor
     /**
      * Register an array of layers as presented in the configuration JSON.
      *
+     * @throws ConfigurationException
      * @param array $layers The layers to register
      */
     private function registerLayers(array $layers)
     {
         foreach ($layers as $layerName => $layer)
         {
-            $newLayer = $this->container->get($layer);
+            if (!array_key_exists('service', $layer)) {
+                throw ConfigurationException::missingSubkey('layer', 'service');
+            }
+
+            $newLayer = $this->container->get($layer['service']);
             $newLayer->setContainer($this->container);
+
+            // Set the layer properties from configuration
+            $newLayer->setName($layerName);
+
+            // TODO: Standardise this check->exception-or-default config init
+            $newLayer->setBypassed(
+                array_key_exists('bypassed', $layer) ? $layer['bypassed'] : false
+            );
+
             $this->layers[$layerName] = $newLayer;
         }
     }
@@ -160,11 +175,25 @@ class App extends AbstractContainerAccessor
                     break;
                 }
 
-                $request = $layer->in($request);
+                $request = $layer->preIn($request);
+
+                if (!$request instanceof Request) {
+                    throw new \RuntimeException(
+                        'Each inbound layer of the application pipeline must produce a Request type. ' .
+                        'The "' . $layer->getName() . '" layer returned ' . gettype($request) . '.'
+                    );
+                }
             }
 
             // Dispatch the request
             $response = $this->dispatch($request);
+
+            if (!$response instanceof Response) {
+                throw new \RuntimeException(
+                    'The controller action method must return a Response type. ' .
+                    'The controller returned ' . gettype($response) . '.'
+                );
+            }
 
             // Pass through layers back outwards
             $reversedLayers = array_reverse($this->layers);
@@ -174,8 +203,17 @@ class App extends AbstractContainerAccessor
                     break;
                 }
 
-                $response = $layer->out($response);
+                $response = $layer->preOut($response);
+
+                if (!$response instanceof Response) {
+                    throw new \RuntimeException(
+                        'Each outbound layer of the application pipeline must produce a Response type. ' .
+                        'The "' . $layer->getName() . '" layer returned ' . gettype($response) . '.'
+                    );
+                }
+
             }
+
 
         } catch(\Exception $exception) {
 
@@ -185,9 +223,6 @@ class App extends AbstractContainerAccessor
             $response = $exceptionHandler->handleExceptionAction($request, $exception);
         }
 
-        // Output content
-        $response->send();
-
         return $response;
     }
 
@@ -195,6 +230,11 @@ class App extends AbstractContainerAccessor
     {
         // Get the controller
         $controllerSpec = $request->parameters->get('_controller');
+
+        if (!$controllerSpec) {
+            throw new \RuntimeException('The request was not tagged by a router.', 500);
+        }
+
         $controller =  $this->container->get($controllerSpec['class']);
         $controller->setContainer($this->container);
 

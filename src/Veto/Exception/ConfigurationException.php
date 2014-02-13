@@ -32,6 +32,17 @@ class ConfigurationException extends \Exception
         );
     }
 
+    public static function missingSubkey($parentKey, $expectedSubkey)
+    {
+        return new self(
+            sprintf(
+                'Key "%s" must contain a child "%s" in the application configuration.',
+                $parentKey,
+                $expectedSubkey
+            )
+        );
+    }
+
     public static function missingImportedFile($file, $importedFrom)
     {
         return new self(

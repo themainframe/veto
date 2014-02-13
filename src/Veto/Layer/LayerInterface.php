@@ -10,7 +10,8 @@
  */
 namespace Veto\Layer;
 
-use Veto\App;
+use Veto\HTTP\Request;
+use Veto\HTTP\Response;
 
 /**
  * LayerInterface
@@ -19,5 +20,6 @@ use Veto\App;
  */
 interface LayerInterface
 {
-    public function __construct(App $app);
+    public function in(Request $request);
+    public function out(Response $response);
 }
