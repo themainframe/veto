@@ -126,7 +126,7 @@ class Container
             if (is_array($parameter)) {
                 $parameter = $this->resolveParameterAliases($parameter);
             } else {
-                if (is_string($parameter) && $parameter[0] == '@') {
+                if (is_string($parameter) && strlen($parameter) > 0 && $parameter[0] == '@') {
                     $parameter = substr($parameter, 1);
                     $parameter = $this->get($parameter);
                 }
