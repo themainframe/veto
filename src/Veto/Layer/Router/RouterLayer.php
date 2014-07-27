@@ -105,4 +105,26 @@ class RouterLayer extends AbstractLayer implements LayerInterface
 
         return $request;
     }
+
+    /**
+     * Generate a URL from a route name and paramters.
+     *
+     * @param string $routeName
+     * @param array $parameters
+     * @return string
+     * @throws \Exception
+     */
+    public function generateUrl($routeName, array $parameters)
+    {
+        $route = $this->routes->get($routeName);
+
+        if (!($route instanceof Route)) {
+            throw new \Exception(
+                'Cannot generate a URL for non-existent route ' . $routeName,
+                500
+            );
+        }
+
+        return $route->generateUrl($parameters);
+    }
 }
