@@ -31,12 +31,14 @@ class Container
      * @param string $className The absolute class name.
      * @param array $params Optionally any parameters to pass to the constructor.
      * @param bool $oneShot Optionally return a new instance every time the service is located.
+     * @param array $calls Optionally an array of methods (keys) and parameters (values) to call on the instance.
      */
-    public function register($alias, $className, $params = array(), $oneShot = true)
+    public function register($alias, $className, $params = array(), $oneShot = true, $calls = array())
     {
         $this->registeredClasses[$alias] = array(
             'className' => $className,
             'parameters' => $params,
+            'calls' => $calls,
             'isOneShot' => $oneShot
         );
     }
@@ -87,13 +89,19 @@ class Container
                     $instance;
             }
 
+            // Call any required methods, passing parameters for each
+            foreach ($definition['calls'] as $methodName => $methodParams) {
+                if ($reflectionClass->hasMethod($methodName)) {
+                    call_user_func_array(array($instance, $methodName), $methodParams);
+                }
+            }
+
             return $instance;
 
         } else if(substr($alias, -2) === '.*') {
 
             $matchedServices = $this->getNamespace(substr($alias, 0, -1));
             $services = array();
-
 
             foreach($matchedServices as $serviceAlias => $service) {
                 $services[] = $this->get($serviceAlias);
