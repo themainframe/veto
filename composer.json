@@ -1,5 +1,6 @@
 {
     "name": "themainframe/veto",
+    "license": "MIT",
     "description": "Veto is a super-lightweight PHP framework to make building web applications easier.",
     "authors": [
         {
