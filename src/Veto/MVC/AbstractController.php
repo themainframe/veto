@@ -19,7 +19,7 @@ use Veto\HTTP\Response;
  *
  * @since 0.1
  */
-class AbstractController extends AbstractContainerAccessor
+abstract class AbstractController extends AbstractContainerAccessor
 {
     /**
      * @return \Veto\DI\Container
