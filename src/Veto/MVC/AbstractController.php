@@ -14,8 +14,8 @@ use Veto\DI\AbstractContainerAccessor;
 use Veto\HTTP\Response;
 
 /**
- * Controller
- * Tags requests for the kernel to dispatch to controllers.
+ * AbstractController
+ * Helper class to provide common utilities to controllers.
  *
  * @since 0.1
  */
