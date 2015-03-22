@@ -18,6 +18,43 @@ use Veto\Collection\Bag;
 class HeaderBag extends Bag
 {
     /**
+     * Special HTTP headers that do not have the "HTTP_" prefix, for some reason.
+     *
+     * @var array
+     */
+    protected static $special = array(
+        'CONTENT_TYPE',
+        'CONTENT_LENGTH',
+        'PHP_AUTH_USER',
+        'PHP_AUTH_PW',
+        'PHP_AUTH_DIGEST',
+        'AUTH_TYPE',
+    );
+
+    /**
+     * Create a new HeaderBag, derived from the provided environment bag.
+     *
+     * @param Bag $environment The environment variables
+     * @return self
+     */
+    public static function createFromEnvironment(Bag $environment)
+    {
+        $headers = new static();
+
+        foreach ($environment as $key => $value) {
+            $key = strtoupper($key);
+            if (strpos($key, 'HTTP_') === 0 || in_array($key, static::$special)) {
+                if ($key === 'HTTP_CONTENT_TYPE' || $key === 'HTTP_CONTENT_LENGTH') {
+                    continue;
+                }
+                $headers->add($key, $value);
+            }
+        }
+
+        return $headers;
+    }
+
+    /**
      * Add a header to the bag
      *
      * @param mixed $key
