@@ -13,7 +13,6 @@ namespace Veto\Debug\Controller;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\MVC\AbstractController;
-use Veto\Twig\HTTP\TwigResponse;
 
 /**
  * ExceptionController
