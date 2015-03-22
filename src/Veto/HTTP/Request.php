@@ -113,6 +113,22 @@ class Request extends Passable implements RequestInterface
     }
 
     /**
+     * Helper method to create a new request based on the provided environment Bag.
+     *
+     * @param Bag $environment
+     * @return Request
+     */
+    public static function createFromEnvironment(Bag $environment)
+    {
+        $method = $environment->get('REQUEST_METHOD');
+        $uri = Uri::createFromEnvironment($environment);
+        $headers = HeaderBag::createFromEnvironment($environment);
+        $body = new MessageBody(fopen('php://input', 'r'));
+
+        return new self($method, $uri, $headers, new Bag(), $environment, $body);
+    }
+
+    /**
      * Retrieves the HTTP protocol version as a string.
      *
      * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
