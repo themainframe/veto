@@ -20,7 +20,7 @@ class Bag implements \IteratorAggregate
     /**
      * @var mixed[]
      */
-    private $items;
+    protected $items;
 
     /**
      * Initialise the object
@@ -69,6 +69,23 @@ class Bag implements \IteratorAggregate
     public function has($key)
     {
         return array_key_exists($key, $this->items);
+    }
+
+    /**
+     * If the bag contains the given key, return the value, then remove it from the bag.
+     *
+     * @param $key
+     * @return mixed|null
+     */
+    public function remove($key)
+    {
+        if (array_key_exists($key, $this->items)) {
+            $value = $this->items[$key];
+            unset($this->items[$key]);
+            return $value;
+        } else {
+            return null;
+        }
     }
 
     /**
