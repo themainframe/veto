@@ -46,17 +46,18 @@ class Bag implements \IteratorAggregate
     }
 
     /**
-     * Get an item from the bag by key
+     * Get an item from the bag by key, optionally returning a default if the key is not found.
      *
      * @param mixed $key
+     * @param mixed $default
      * @return mixed|null
      */
-    public function get($key)
+    public function get($key, $default = null)
     {
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         } else {
-            return null;
+            return is_null($default) ? null : $default;
         }
     }
 
