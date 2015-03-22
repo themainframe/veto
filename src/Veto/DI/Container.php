@@ -114,6 +114,24 @@ class Container
         }
     }
 
+    /**
+     * Return a list of registered services in this container.
+     *
+     * @return array
+     */
+    public function getRegisteredServices()
+    {
+        return array_map(function($service) {
+
+            if (isset($service['instance'])) {
+                unset($service['instance']);
+            }
+
+            return $service;
+
+        }, $this->registeredClasses);
+    }
+
     private function getNamespace($namespace)
     {
         // Get all the services under a namespace
