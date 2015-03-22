@@ -10,27 +10,29 @@
  */
 namespace Veto\Configuration;
 
+use Symfony\Component\Yaml\Parser;
 use Veto\Collection\Tree;
 use Veto\Exception\ConfigurationException;
 
 /**
  * Hive
- * Implements a configuration hive that can handle loading from JSON config files.
+ * Implements a configuration hive that can handle loading from YAML config files.
  *
  * @since 0.1
  */
 class Hive extends Tree
 {
     /**
-     * Load configuration data from a JSON file.
+     * Load configuration data from a YAML file.
      *
      * @throws ConfigurationException
-     * @param string $path The path to the JSON configuration file.
+     * @param string $path The path to the YAML configuration file.
      */
-    public function loadJson($path)
+    public function load($path)
     {
-        $configJSON = file_get_contents($path);
-        $config = json_decode($configJSON, true);
+        $parser = new Parser();
+        $configYAML = file_get_contents($path);
+        $config = $parser->parse($configYAML);
 
         // Process any @import directives
         if (array_key_exists('@import', $config)) {
@@ -51,7 +53,7 @@ class Hive extends Tree
                     );
                 }
 
-                $this->loadJson($importPath);
+                $this->load($importPath);
             }
 
             // Do not keep these in the configuration hive

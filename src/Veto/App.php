@@ -74,10 +74,10 @@ class App extends AbstractContainerAccessor
         $this->config = new Hive;
 
         // Load the base configuration
-        $this->config->loadJson($this->path . '/../config/base.json');
+        $this->config->load($this->path . '/../config/base.yml');
 
         // Read configuration information
-        $this->config->loadJson($configPath);
+        $this->config->load($configPath);
 
         // Initialise service container
         $this->container = new Container;

@@ -1,0 +1,5 @@
+services:
+    controller:
+        _exception_handler:
+            class: \Veto\Debug\Controller\ExceptionController
+            one_shot: true
