@@ -72,11 +72,11 @@ class Request extends Passable implements RequestInterface
     protected $headers;
 
     /**
-     * The request attributes
+     * The request parameters
      *
      * @var Bag
      */
-    protected $attributes;
+    protected $parameters;
 
     /**
      * The request body
@@ -86,19 +86,30 @@ class Request extends Passable implements RequestInterface
     protected $body;
 
     /**
-     * Initialise the request from the current state of the global environment.
+     * Create new HTTP request
+     *
+     * @param string $method The request method
+     * @param UriInterface $uri The request URI object
+     * @param HeaderBag $headers The request headers collection
+     * @param Bag $cookies The request cookies collection
+     * @param Bag $serverParams The server environment variables
+     * @param StreamableInterface $body The request body object
      */
-    public function initWithGlobals()
-    {
-        // Populate the HTTP protocol information
-        $this->protocolVersion =
-            substr(
-                $_SERVER['SERVER_PROTOCOL'],
-                strpos($_SERVER['SERVER_PROTOCOL'], '/') + 1
-            );
-
-        // Set the request body
-        $this->body = new MessageBody(fopen('php://input', 'r'));
+    public function __construct(
+        $method,
+        UriInterface $uri,
+        HeaderBag $headers,
+        Bag $cookies,
+        Bag $serverParams,
+        StreamableInterface $body
+    ) {
+        $this->method = $method;
+        $this->uri = $uri;
+        $this->headers = $headers;
+        $this->cookies = $cookies;
+        $this->serverParams = $serverParams;
+        $this->parameters = new Bag();
+        $this->body = $body;
     }
 
     /**
@@ -242,7 +253,10 @@ class Request extends Passable implements RequestInterface
      */
     public function withBody(StreamableInterface $body)
     {
-        // TODO: Implement withBody() method.
+        $clone = clone $this;
+        $clone->body = $body;
+
+        return $clone;
     }
 
     /**
@@ -263,7 +277,7 @@ class Request extends Passable implements RequestInterface
      */
     public function getHeaders()
     {
-        // TODO: Implement getHeaders() method.
+        return $this->headers->all();
     }
 
     /**
@@ -282,7 +296,7 @@ class Request extends Passable implements RequestInterface
      */
     public function getHeader($name)
     {
-        // TODO: Implement getHeader() method.
+        return implode(',', $this->headers->get($name));
     }
 
     /**
@@ -303,7 +317,7 @@ class Request extends Passable implements RequestInterface
      */
     public function getHeaderLines($name)
     {
-        // TODO: Implement getHeaderLines() method.
+        return $this->headers->get($name);
     }
 
     /**
@@ -324,7 +338,23 @@ class Request extends Passable implements RequestInterface
      */
     public function getRequestTarget()
     {
-        // TODO: Implement getRequestTarget() method.
+        if ($this->requestTarget) {
+            return $this->requestTarget;
+        }
+
+        if ($this->uri === null) {
+            return '/';
+        }
+
+        $path = $this->uri->getPath();
+        $query = $this->uri->getQuery();
+        if ($query) {
+            $path .= '?' . $query;
+        }
+
+        $this->requestTarget = $path;
+
+        return $this->requestTarget;
     }
 
     /**
@@ -346,7 +376,16 @@ class Request extends Passable implements RequestInterface
      */
     public function withRequestTarget($requestTarget)
     {
-        // TODO: Implement withRequestTarget() method.
+        if (preg_match('#\s#', $requestTarget)) {
+            throw new \InvalidArgumentException(
+                'Invalid request target provided; must be a string and cannot contain whitespace'
+            );
+        }
+
+        $clone = clone $this;
+        $clone->requestTarget = $requestTarget;
+
+        return $clone;
     }
 
     /**
@@ -356,7 +395,9 @@ class Request extends Passable implements RequestInterface
      */
     public function getMethod()
     {
-        // TODO: Implement getMethod() method.
+        $overrideMethod = $this->getHeader('X-Http-Method-Override');
+
+        return $overrideMethod ? $overrideMethod : $this->method;
     }
 
     /**
@@ -376,7 +417,10 @@ class Request extends Passable implements RequestInterface
      */
     public function withMethod($method)
     {
-        // TODO: Implement withMethod() method.
+        $clone = clone $this;
+        $clone->method = $method;
+
+        return $clone;
     }
 
     /**
@@ -390,7 +434,7 @@ class Request extends Passable implements RequestInterface
      */
     public function getUri()
     {
-        // TODO: Implement getUri() method.
+        return $this->uri;
     }
 
     /**
@@ -406,7 +450,85 @@ class Request extends Passable implements RequestInterface
      */
     public function withUri(UriInterface $uri)
     {
-        // TODO: Implement withUri() method.
+        $clone = clone $this;
+        $clone->uri = $uri;
+
+        return $clone;
     }
 
+    /**
+     * Retrieve all parameters for this request.
+     *
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters->all();
+    }
+
+    /**
+     * Get a parameter of this request.
+     *
+     * @param $key
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getParameter($key, $default = null)
+    {
+        return $this->parameters->get($key, $default);
+    }
+
+    /**
+     * Check if the request has a parameter with the specified key.
+     *
+     * @param $key
+     * @return bool
+     */
+    public function hasParameter($key)
+    {
+        return $this->parameters->has($key);
+    }
+
+    /**
+     * Return a new Request instance with an additional specified parameter.
+     *
+     * @param $key
+     * @param $value
+     * @return Request
+     */
+    public function withParameter($key, $value)
+    {
+        $clone = clone $this;
+        $clone->parameters->add($key, $value);
+
+        return $clone;
+    }
+
+    /**
+     * Return a new Request instance with a replaced, new set of parameters.
+     *
+     * @param $parameters
+     * @return Request
+     */
+    public function withParameters($parameters)
+    {
+        $clone = clone $this;
+        $clone->parameters = new Bag($parameters);
+
+        return $clone;
+    }
+
+    /**
+     * Return a new Request instance without the specified parameter.
+     *
+     * @param $key
+     * @return Request
+     */
+    public function withoutParameter($key)
+    {
+        $clone = clone $this;
+        $clone->parameters->remove($key);
+
+        return $clone;
+    }
 }
