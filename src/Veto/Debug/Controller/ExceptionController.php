@@ -34,7 +34,7 @@ class ExceptionController extends AbstractController
 
         // TODO: Improve this mechanic.
         $this->get('templating')->addPath(
-            $this->get('app')->path . '/Veto/Debug/Resources/'
+            $this->get('app')->path . '/Veto/Debug/Resources/Exception'
         );
 
         // Render the template
