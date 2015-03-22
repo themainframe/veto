@@ -94,6 +94,15 @@ class Response extends Passable implements ResponseInterface
     }
 
     /**
+     * Send both headers and content.
+     */
+    public function send()
+    {
+        $this->sendHeaders();
+        $this->sendBody();
+    }
+
+    /**
      * Send the HTTP headers for this response.
      */
     public function sendHeaders()
