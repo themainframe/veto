@@ -10,12 +10,16 @@
  */
 namespace Veto;
 
+use Veto\Collection\Bag;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\Exception\ConfigurationException;
+use Veto\HTTP\HeaderBag;
+use Veto\HTTP\MessageBody;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
+use Veto\HTTP\Uri;
 use Veto\Layer\AbstractLayer;
 
 /**
@@ -160,7 +164,7 @@ class App extends AbstractContainerAccessor
     }
 
     /**
-     * Handle the request using the defined layer chain.
+     * Handle a request using the defined layer chain.
      *
      * @param Request $request
      * @return Response
@@ -230,7 +234,7 @@ class App extends AbstractContainerAccessor
     public function dispatch(Request $request)
     {
         // Get the controller
-        $controllerSpec = $request->parameters->get('_controller');
+        $controllerSpec = $request->getParameter('_controller');
 
         if (!$controllerSpec) {
             throw new \RuntimeException('The request was not tagged by a router.', 500);
@@ -267,8 +271,8 @@ class App extends AbstractContainerAccessor
             }
 
             // Should a request parameter be passed here?
-            if ($request->parameters->has($parameterName)) {
-                $passedArgs[] = $request->parameters->get($parameterName);
+            if ($request->hasParameter($parameterName)) {
+                $passedArgs[] = $request->getParameter($parameterName);
             }
         }
 
