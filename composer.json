@@ -12,6 +12,6 @@
         "psr-0": { "Veto": "src/" }
     },
     "require": {
-        "symfony/yaml": "~2.7"
+        "symfony/yaml": "2.6.5"
     }
 }
