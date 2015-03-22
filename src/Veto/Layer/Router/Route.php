@@ -100,7 +100,7 @@ class Route
             $placeholders = $placeholders[1];
 
             // See if the route matches
-            if (preg_match('@^' . $pattern . '$@', $request->getUri(), $matches)) {
+            if (preg_match('@^' . $pattern . '$@', $request->getUri()->getPath(), $matches)) {
                 // Merge the placeholder names with their URI values
                 array_shift($matches);
                 return array_combine($placeholders, $matches);

@@ -79,14 +79,14 @@ class RouterLayer extends AbstractLayer implements LayerInterface
             if ($placeholders !== false) {
 
                 // Add the matched route's parameters to the request
-                $request->parameters->add('_controller', array(
+                $request = $request->withParameter('_controller', array(
                     'class' => $route->getController(),
                     'method' => $route->getAction()
                 ));
 
                 // Add any matched route placeholders to the request parameters
                 foreach ($placeholders as $placeholderKey => $placeholderValue) {
-                    $request->parameters->add($placeholderKey, $placeholderValue);
+                    $request = $request->withParameter($placeholderKey, $placeholderValue);
                 }
 
                 $tagged = true;
@@ -98,7 +98,7 @@ class RouterLayer extends AbstractLayer implements LayerInterface
         if (!$tagged) {
             throw new \Exception(
                 'No route defined for ' . $request->getMethod() . ' ' .
-                $request->getUri(),
+                $request->getUri()->getPath(),
                 404
             );
         }
