@@ -19,7 +19,7 @@ use Veto\HTTP\Response;
  *
  * @since 0.1
  */
-abstract class AbstractLayer extends AbstractContainerAccessor
+abstract class AbstractLayer extends AbstractContainerAccessor implements LayerInterface
 {
     /**
      * The name of the layer within the application, distinct from the class.

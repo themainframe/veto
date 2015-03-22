@@ -23,7 +23,7 @@ use Veto\Exception\ConfigurationException;
  *
  * @since 0.1
  */
-class RouterLayer extends AbstractLayer implements LayerInterface
+class RouterLayer extends AbstractLayer
 {
     /**
      * The routes managed by this Router.
