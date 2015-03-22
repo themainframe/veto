@@ -21,6 +21,7 @@ use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\HTTP\Uri;
 use Veto\Layer\AbstractLayer;
+use Veto\MVC\DispatcherInterface;
 
 /**
  * App
@@ -89,6 +90,7 @@ class App extends AbstractContainerAccessor
         // Register the kernel & configuration hive
         $this->container->registerInstance('config', $this->config);
         $this->container->registerInstance('app', $this);
+        $this->container->registerInstance('container', $this->container);
 
         // Register services
         $this->registerServices(
@@ -233,51 +235,13 @@ class App extends AbstractContainerAccessor
 
     public function dispatch(Request $request)
     {
-        // Get the controller
-        $controllerSpec = $request->getParameter('_controller');
+        // Obtain the dispatcher service
+        $dispatcher = $this->container->get('dispatcher');
 
-        if (!$controllerSpec) {
-            throw new \RuntimeException('The request was not tagged by a router.', 500);
+        if ($dispatcher instanceof DispatcherInterface) {
+            return $dispatcher->dispatch($request);
+        } else {
+            throw new \RuntimeException('The dispatcher service must be an instance of \Veto\MVC\DispatcherInterface');
         }
-
-        $controller =  $this->container->get($controllerSpec['class']);
-        $controller->setContainer($this->container);
-
-        if (!method_exists($controller, $controllerSpec['method'])) {
-            throw new \Exception(
-                'The controller action "' . $controllerSpec['method'] .
-                '" does not exist for controller "' .
-                $controllerSpec['class'] . '".'
-            );
-        }
-
-        // Prepare to run the action method
-        $actionMethod = new \ReflectionMethod($controller, $controllerSpec['method']);
-        $parameters = $actionMethod->getParameters();
-        $passedArgs = array();
-
-        foreach ($parameters as $parameter) {
-
-            $hintedClass = $parameter->getClass();
-            $parameterName = $parameter->getName();
-
-            if ($hintedClass) {
-                $hintedClass = $hintedClass->getName();
-            }
-
-            // Special case - should the Request object be passed here?
-            if ($parameterName == 'request' && $hintedClass == 'Veto\HTTP\Request') {
-                $passedArgs[] = $request;
-            }
-
-            // Should a request parameter be passed here?
-            if ($request->hasParameter($parameterName)) {
-                $passedArgs[] = $request->getParameter($parameterName);
-            }
-        }
-
-        $response = $actionMethod->invokeArgs($controller, $passedArgs);
-
-        return $response;
     }
 }

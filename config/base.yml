@@ -3,3 +3,8 @@ services:
         _exception_handler:
             class: \Veto\Debug\Controller\ExceptionController
             one_shot: true
+
+    dispatcher:
+        class: \Veto\MVC\Dispatcher
+        parameters:
+          - @container
