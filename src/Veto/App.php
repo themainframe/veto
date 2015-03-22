@@ -233,7 +233,14 @@ class App extends AbstractContainerAccessor
         return $response;
     }
 
-    public function dispatch(Request $request)
+    /**
+     * Find a controller to handle the request instance.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws \RuntimeException
+     */
+    private function dispatch(Request $request)
     {
         // Obtain the dispatcher service
         $dispatcher = $this->container->get('dispatcher');
