@@ -1,7 +1,19 @@
+routes:
+
+    _container_debug:
+        url: /_debug/container
+        controller: controller._container_debug
+        action: containerDebug
+        methods:
+          - GET
+
 services:
     controller:
         _exception_handler:
             class: \Veto\Debug\Controller\ExceptionController
+            one_shot: true
+        _container_debug:
+            class: \Veto\Debug\Controller\ContainerDebugController
             one_shot: true
 
     dispatcher:
