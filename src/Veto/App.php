@@ -10,16 +10,12 @@
  */
 namespace Veto;
 
-use Veto\Collection\Bag;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\Exception\ConfigurationException;
-use Veto\HTTP\HeaderBag;
-use Veto\HTTP\MessageBody;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
-use Veto\HTTP\Uri;
 use Veto\Layer\AbstractLayer;
 use Veto\MVC\DispatcherInterface;
 
@@ -48,7 +44,7 @@ class App extends AbstractContainerAccessor
     private $layers;
 
     /**
-     * @var Tree
+     * @var \Veto\Collection\Bag
      */
     public $parameters;
 
