@@ -13,6 +13,7 @@ namespace Veto;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
+use Veto\DI\Definition;
 use Veto\Exception\ConfigurationException;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
@@ -84,9 +85,9 @@ class App extends AbstractContainerAccessor
         $this->container = new Container;
 
         // Register the kernel & configuration hive
-        $this->container->registerInstance('config', $this->config);
-        $this->container->registerInstance('app', $this);
-        $this->container->registerInstance('container', $this->container);
+        $this->container->defineInstance('config', $this->config);
+        $this->container->defineInstance('app', $this);
+        $this->container->defineInstance('container', $this->container);
 
         // Register services
         $this->registerServices(
@@ -112,13 +113,8 @@ class App extends AbstractContainerAccessor
             if (isset($element['class'])) {
 
                 // This is a service definition
-                $this->container->register(
-                    $namespace . ($namespace ? '.' : '') . $name,
-                    $element['class'],
-                    isset($element['parameters']) ? $element['parameters'] : array(),
-                    isset($element['one_shot']) ? $element['one_shot'] : false,
-                    isset($element['calls']) ? $element['calls'] : array()
-                );
+                $definition = Definition::initWithArray($namespace . ($namespace ? '.' : '') . $name, $element);
+                $this->container->define($definition);
 
             } else {
 

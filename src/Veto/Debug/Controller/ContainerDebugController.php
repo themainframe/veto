@@ -33,7 +33,7 @@ class ContainerDebugController extends AbstractController
 
         // Render the template
         $response = $this->get('templating')->render('List.twig', array(
-            'services' => $this->container->getRegisteredServices()
+            'services' => $this->container->getDefinitions()
         ));
 
         return new Response($response);

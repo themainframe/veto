@@ -18,147 +18,164 @@ namespace Veto\DI;
 class Container
 {
     /**
-     * The underlying associative array of services managed by this container.
+     * Services defined for this container.
      *
-     * @var array
+     * @var Definition[]
      */
-    protected $registeredClasses = array();
+    private $definitions;
 
     /**
-     * Register a service in the container.
+     * Cached instances of services in this container.
      *
-     * @param string $alias The name for the service.
-     * @param string $className The absolute class name.
-     * @param array $params Optionally any parameters to pass to the constructor.
-     * @param bool $oneShot Optionally return a new instance every time the service is located.
-     * @param array $calls Optionally an array of methods (keys) and parameters (values) to call on the instance.
+     * @var object[]
      */
-    public function register($alias, $className, $params = array(), $oneShot = true, $calls = array())
-    {
-        $this->registeredClasses[$alias] = array(
-            'className' => $className,
-            'parameters' => $params,
-            'calls' => $calls,
-            'isOneShot' => $oneShot
-        );
-    }
+    private $instances;
 
     /**
-     * Register an existing instance in the container.
+     * Define a service within the container, optionally providing a pre-existing instance of the service.
      *
-     * @param string $alias The name for the service.
-     * @param mixed $instance The existing object.
+     * @param Definition $definition
+     * @param mixed|null $instance
      */
-    public function registerInstance($alias, $instance)
+    public function define(Definition $definition, $instance = null)
     {
-        $this->registeredClasses[$alias] = array(
-            'className' => get_class($instance),
-            'isOneShot' => false,
-            'instance' => $instance
-        );
-    }
+        $this->definitions[$definition->getName()] = $definition;
 
-    /**
-     * Locate a service by alias and return an instance of it.
-     *
-     * @param string $alias The alias to look for.
-     * @return object|null
-     * @throws \Exception
-     */
-    public function get($alias)
-    {
-        if (array_key_exists($alias, $this->registeredClasses)) {
-
-            $definition = $this->registeredClasses[$alias];
-
-            // Should a new instance be returned every time?
-            if (!$definition['isOneShot'] && isset($definition['instance'])) {
-                return $definition['instance'];
-            }
-
-            $parameterAliases = $definition['parameters'];
-            $className = $definition['className'];
-            $parameters = $this->resolveParameterAliases($parameterAliases);
-
-            $reflectionClass = new \ReflectionClass($className);
-            $instance = $reflectionClass->newInstanceArgs($parameters);
-
-            // Persist, or one-shot instance?
-            if (!$definition['isOneShot']) {
-                $this->registeredClasses[$alias]['instance'] =
-                    $instance;
-            }
-
-            // Call any required methods, passing parameters for each
-            foreach ($definition['calls'] as $methodName => $methodParams) {
-                if ($reflectionClass->hasMethod($methodName)) {
-                    call_user_func_array(array($instance, $methodName), $methodParams);
-                }
-            }
-
-            return $instance;
-
-        } else if(substr($alias, -2) === '.*') {
-
-            $matchedServices = $this->getNamespace(substr($alias, 0, -1));
-            $services = array();
-
-            foreach($matchedServices as $serviceAlias => $service) {
-                $services[] = $this->get($serviceAlias);
-            }
-
-            return $services;
-
-        } else {
-            throw new \Exception('Unknown DI alias ' . $alias);
+        if (!is_null($instance)) {
+            $this->instances[$definition->getName()] = $instance;
         }
     }
 
     /**
-     * Return a list of registered services in this container.
+     * Helper method to define a service by name and instance.
      *
+     * @param string $serviceName
+     * @param mixed $instance
+     */
+    public function defineInstance($serviceName, $instance)
+    {
+        $definition = new Definition();
+        $definition->setName($serviceName);
+        $definition->setClassName(get_class($instance));
+
+        $this->define($definition, $instance);
+    }
+
+    /**
+     * Undefine a service by name.
+     *
+     * @param $serviceName
+     */
+    public function undefine($serviceName)
+    {
+        if (isset($this->definitions[$serviceName])) {
+            unset($this->definitions[$serviceName]);
+        }
+    }
+
+    /**
+     * Retrieve a service from the container.
+     *
+     * @param $serviceName
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function get($serviceName)
+    {
+        if (!$this->isDefined($serviceName)) {
+            throw new \RuntimeException('The service name "' . $serviceName . '" is not defined.');
+        }
+
+        // Retrieve the definition
+        $definition = $this->definitions[$serviceName];
+
+        // If the service isn't One Shot and has already been built, return the instance
+        if (!$definition->isOneShot() && $this->isInstantiated($serviceName)) {
+            return $this->instances[$serviceName];
+        }
+
+        // If any parameters are defined, resolve them
+        $definedParameters = $definition->getParameters();
+        $parameters = array();
+
+        if (is_array($definedParameters) && count($definedParameters) > 0) {
+            $parameters = $this->resolveParameters($definedParameters);
+        }
+
+        $reflectionClass = new \ReflectionClass($definition->getClassName());
+        $instance = $reflectionClass->newInstanceArgs($parameters);
+
+        // Process any calls that have been defined
+        if (is_array($definition->getCalls())) {
+            foreach ($definition->getCalls() as $method => $arguments) {
+                if ($reflectionClass->hasMethod($method)) {
+                    // Resolve the arguments as parameters
+                    $resolvedArguments = $this->resolveParameters($arguments);
+                    call_user_func_array(array($instance, $method), $resolvedArguments);
+                }
+            }
+        }
+
+        // Cache the instance if it isn't One Shot
+        if (!$definition->isOneShot()) {
+            $this->instances[$serviceName] = $instance;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Check if $serviceName is defined inside this container.
+     *
+     * @param $serviceName
+     * @return bool
+     */
+    public function isDefined($serviceName)
+    {
+        return array_key_exists($serviceName, $this->definitions);
+    }
+
+    /**
+     * Check if $serviceName is defined and instantiated inside this container.
+     *
+     * @param $serviceName
+     * @return bool
+     */
+    public function isInstantiated($serviceName)
+    {
+        return $this->isDefined($serviceName) && array_key_exists($serviceName, $this->instances);
+    }
+
+    /**
+     * @return Definition[]
+     */
+    public function getDefinitions()
+    {
+        return $this->definitions;
+    }
+
+    /**
+     * Resolve an array of parameter names into their actual instances.
+     *
+     * @param array $parameters
      * @return array
      */
-    public function getRegisteredServices()
+    private function resolveParameters(array $parameters)
     {
-        return array_map(function($service) {
+        $resolvedParameters = array();
 
-            if (isset($service['instance'])) {
-                unset($service['instance']);
-            }
+        foreach ($parameters as $parameter) {
 
-            return $service;
-
-        }, $this->registeredClasses);
-    }
-
-    private function getNamespace($namespace)
-    {
-        // Get all the services under a namespace
-        $matches = array();
-
-        foreach ($this->registeredClasses as $alias => $service) {
-            if (strpos($alias, $namespace) === 0) {
-                $matches[$alias] = $service;
-            }
-        }
-
-        return $matches;
-    }
-
-    private function resolveParameterAliases($parameters)
-    {
-        foreach ($parameters as & $parameter) {
-            if (is_array($parameter)) {
-                $parameter = $this->resolveParameterAliases($parameter);
+            // Does this parameter look like a reference to a service (@servicename) ?
+            if (is_string($parameter) && strlen($parameter) > 0 && $parameter[0] == '@') {
+                $bareParameterName = substr($parameter, 1);
+                $resolvedParameters[] = $this->get($bareParameterName);
             } else {
-                if (is_string($parameter) && strlen($parameter) > 0 && $parameter[0] == '@') {
-                    $parameter = substr($parameter, 1);
-                    $parameter = $this->get($parameter);
-                }
+                $resolvedParameters[] = $parameter;
             }
         }
 
-        return $parameters;
+        return $resolvedParameters;
     }
+
 }
