@@ -473,6 +473,16 @@ class Request extends Passable implements RequestInterface
     }
 
     /**
+     * Get the Query String parameters.
+     *
+     * @return Bag
+     */
+    public function getQueryParams()
+    {
+        return $this->queryParams;
+    }
+
+    /**
      * Retrieve all parameters for this request.
      *
      * @return array
