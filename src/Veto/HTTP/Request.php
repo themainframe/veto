@@ -14,13 +14,12 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamableInterface;
 use Psr\Http\Message\UriInterface;
 use Veto\Collection\Bag;
-use Veto\Layer\Passable;
 
 /**
  * Request
  * @since 0.1
  */
-class Request extends Passable implements RequestInterface
+class Request implements RequestInterface
 {
     /**
      * The HTTP protocol version

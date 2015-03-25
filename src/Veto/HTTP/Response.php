@@ -13,14 +13,13 @@ namespace Veto\HTTP;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamableInterface;
 use Veto\Collection\Bag;
-use Veto\Layer\Passable;
 
 /**
  * Response
  *
  * @since 0.1
  */
-class Response extends Passable implements ResponseInterface
+class Response implements ResponseInterface
 {
     /**
      * The response HTTP protocol version

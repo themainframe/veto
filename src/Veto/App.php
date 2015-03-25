@@ -18,6 +18,8 @@ use Veto\Exception\ConfigurationException;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\Layer\AbstractLayer;
+use Veto\Layer\InboundLayerInterface;
+use Veto\Layer\OutboundLayerInterface;
 use Veto\MVC\DispatcherInterface;
 
 /**
@@ -40,7 +42,7 @@ class App extends AbstractContainerAccessor
     public $version = "0.1.1";
 
     /**
-     * @var AbstractLayer[]
+     * @var object[]
      */
     private $layers;
 
@@ -144,15 +146,6 @@ class App extends AbstractContainerAccessor
 
             $newLayer = $this->container->get($layer['service']);
             $newLayer->setContainer($this->container);
-
-            // Set the layer properties from configuration
-            $newLayer->setName($layerName);
-
-            // TODO: Standardise this check->exception-or-default config init
-            $newLayer->setBypassed(
-                array_key_exists('bypassed', $layer) ? $layer['bypassed'] : false
-            );
-
             $this->layers[$layerName] = $newLayer;
         }
     }
@@ -170,11 +163,9 @@ class App extends AbstractContainerAccessor
             // Pass through layers inwards
             foreach ($this->layers as $layer) {
 
-                if ($request->getSkipAll()) {
-                    break;
+                if ($layer instanceof InboundLayerInterface) {
+                    $request = $layer->in($request);
                 }
-
-                $request = $layer->preIn($request);
 
                 if (!$request instanceof Request) {
                     throw new \RuntimeException(
@@ -198,11 +189,9 @@ class App extends AbstractContainerAccessor
             $reversedLayers = array_reverse($this->layers);
             foreach ($reversedLayers as $layer) {
 
-                if ($response->getSkipAll()) {
-                    break;
+                if ($layer instanceof OutboundLayerInterface) {
+                    $response = $layer->out($response);
                 }
-
-                $response = $layer->preOut($response);
 
                 if (!$response instanceof Response) {
                     throw new \RuntimeException(

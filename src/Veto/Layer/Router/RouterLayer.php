@@ -12,9 +12,9 @@ namespace Veto\Layer\Router;
 
 use Veto\App;
 use Veto\Collection\Bag;
+use Veto\DI\AbstractContainerAccessor;
 use Veto\HTTP\Request;
-use Veto\Layer\AbstractLayer;
-use Veto\Layer\LayerInterface;
+use Veto\Layer\InboundLayerInterface;
 use Veto\Exception\ConfigurationException;
 
 /**
@@ -23,7 +23,7 @@ use Veto\Exception\ConfigurationException;
  *
  * @since 0.1
  */
-class RouterLayer extends AbstractLayer
+class RouterLayer extends AbstractContainerAccessor implements InboundLayerInterface
 {
     /**
      * The routes managed by this Router.

@@ -10,16 +10,12 @@
  */
 namespace Veto\Layer;
 
-use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 
 /**
- * LayerInterface
- *
- * @since 0.1
+ * OutboundLayerInterface
  */
-interface LayerInterface
+interface OutboundLayerInterface
 {
-    public function in(Request $request);
     public function out(Response $response);
 }
