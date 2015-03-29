@@ -8,6 +8,10 @@ routes:
           - GET
 
 services:
+
+    event_dispatcher:
+        class: \Veto\Event\Dispatcher
+
     controller:
         _exception_handler:
             class: \Veto\Debug\Controller\ExceptionController
