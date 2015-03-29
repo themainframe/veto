@@ -24,3 +24,4 @@ services:
         class: \Veto\Layer\LayerChain
         parameters:
           - @config
+          - @container

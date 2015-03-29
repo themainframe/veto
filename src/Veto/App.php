@@ -95,11 +95,6 @@ class App extends AbstractContainerAccessor
         $this->registerServices(
             isset($this->config['services']) ? $this->config['services'] : array()
         );
-
-        // Initialise middleware
-        $this->registerLayers(
-            isset($this->config['layers']) ? $this->config['layers'] : array()
-        );
     }
 
     /**
@@ -131,79 +126,6 @@ class App extends AbstractContainerAccessor
     }
 
     /**
-     * Register an array of layers as presented in the configuration JSON.
-     *
-     * @throws ConfigurationException
-     * @param array $layers The layers to register
-     */
-    private function registerLayers(array $layers)
-    {
-        foreach ($layers as $layerName => $layer)
-        {
-            if (!array_key_exists('service', $layer)) {
-                throw ConfigurationException::missingSubkey('layer', 'service');
-            }
-
-            $newLayer = $this->container->get($layer['service']);
-            $newLayer->setContainer($this->container);
-            $this->layers[$layerName] = $newLayer;
-        }
-    }
-
-
-    private function processInboundLayers(Request $request)
-    {
-        $result = $request;
-
-        // Pass through layers inwards
-        foreach ($this->layers as $layer) {
-
-            if (!($layer instanceof InboundLayerInterface)) {
-                continue;
-            }
-
-            $result = $layer->in($result);
-
-            // If the layer produces a response, no more inbound layers may execute
-            if ($result instanceof Response) {
-                return $result;
-            }
-
-            if (!$result instanceof Request) {
-                throw new \RuntimeException(
-                    'Each inbound layer of the application pipeline must produce a Request or Response type. ' .
-                    'The "' . $layer->getName() . '" layer returned ' . gettype($request) . '.'
-                );
-            }
-        }
-
-        return $result;
-    }
-
-    private function processOutboundLayers(Response $response)
-    {
-        $result = $response;
-
-        foreach ($this->layers as $layer) {
-
-            if (!($layer instanceof OutboundLayerInterface)) {
-                continue;
-            }
-
-            $result = $layer->out($result);
-
-            if (!$result instanceof Response) {
-                throw new \RuntimeException(
-                    'Each outbound layer of the application pipeline must produce a Response type. ' .
-                    'The "' . $layer->getName() . '" layer returned ' . gettype($response) . '.'
-                );
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Handle a request using the defined layer chain.
      *
      * @param Request $request
@@ -213,18 +135,9 @@ class App extends AbstractContainerAccessor
     {
         try {
 
-            $response = $this->processInboundLayers($request);
-
-            // By the end of the inbound layer list, a response should have been obtained
-            if (!$response instanceof Response) {
-                throw new \RuntimeException(
-                    'At least one inbound layer must produce a Response instance. ' .
-                    'The final processed layer returned a "' . gettype($response) . '".'
-                );
-            }
-
-            // The response should now be processed by the outbound layers
-            $response = $this->processOutboundLayers($response);
+            // TODO: Not keen on this, need to find a way to avoid referencing the chain service, tags?
+            $layerChain = $this->container->get('chain');
+            $response = $layerChain->processLayers($request);
 
         } catch(\Exception $exception) {
 
