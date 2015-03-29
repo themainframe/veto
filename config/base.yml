@@ -20,7 +20,7 @@ services:
             class: \Veto\Debug\Controller\ContainerDebugController
             one_shot: true
 
-    dispatcher:
-        class: \Veto\MVC\Dispatcher
+    chain:
+        class: \Veto\Layer\LayerChain
         parameters:
-          - @container
+          - @config

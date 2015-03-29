@@ -8,19 +8,25 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\MVC;
+namespace Veto\Layer\Dispatcher;
 
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
+use Veto\HTTP\Response;
+use Veto\Layer\InboundLayerInterface;
 
 /**
+ * DispatcherLayer
+ *
  * Dispatches a Request to a controller, obtaining a Response.
  */
-class Dispatcher extends AbstractContainerAccessor implements DispatcherInterface
+class DispatcherLayer extends AbstractContainerAccessor implements InboundLayerInterface
 {
     /**
      * Set the service container.
+     *
+     * @param Container $container
      */
     public function __construct(Container $container)
     {
@@ -28,13 +34,11 @@ class Dispatcher extends AbstractContainerAccessor implements DispatcherInterfac
     }
 
     /**
-     * Dispatch a request to a controller action method.
-     *
-     * @throws \RuntimeException
      * @param Request $request
      * @return mixed
+     * @throws \RuntimeException
      */
-    public function dispatch(Request $request)
+    public function in(Request $request)
     {
         // Get the controller
         $controllerSpec = $request->getParameter('_controller');
@@ -80,6 +84,14 @@ class Dispatcher extends AbstractContainerAccessor implements DispatcherInterfac
         }
 
         $response = $actionMethod->invokeArgs($controller, $passedArgs);
+
+        // By the end of the inbound layer list, a response should have been obtained
+        if (!$response instanceof Response) {
+            throw new \RuntimeException(
+                'The controller action method must return a Response type. ' .
+                'The controller returned ' . gettype($response) . '.'
+            );
+        }
 
         return $response;
     }

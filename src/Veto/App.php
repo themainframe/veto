@@ -150,6 +150,59 @@ class App extends AbstractContainerAccessor
         }
     }
 
+
+    private function processInboundLayers(Request $request)
+    {
+        $result = $request;
+
+        // Pass through layers inwards
+        foreach ($this->layers as $layer) {
+
+            if (!($layer instanceof InboundLayerInterface)) {
+                continue;
+            }
+
+            $result = $layer->in($result);
+
+            // If the layer produces a response, no more inbound layers may execute
+            if ($result instanceof Response) {
+                return $result;
+            }
+
+            if (!$result instanceof Request) {
+                throw new \RuntimeException(
+                    'Each inbound layer of the application pipeline must produce a Request or Response type. ' .
+                    'The "' . $layer->getName() . '" layer returned ' . gettype($request) . '.'
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    private function processOutboundLayers(Response $response)
+    {
+        $result = $response;
+
+        foreach ($this->layers as $layer) {
+
+            if (!($layer instanceof OutboundLayerInterface)) {
+                continue;
+            }
+
+            $result = $layer->out($result);
+
+            if (!$result instanceof Response) {
+                throw new \RuntimeException(
+                    'Each outbound layer of the application pipeline must produce a Response type. ' .
+                    'The "' . $layer->getName() . '" layer returned ' . gettype($response) . '.'
+                );
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Handle a request using the defined layer chain.
      *
@@ -160,48 +213,18 @@ class App extends AbstractContainerAccessor
     {
         try {
 
-            // Pass through layers inwards
-            foreach ($this->layers as $layer) {
+            $response = $this->processInboundLayers($request);
 
-                if ($layer instanceof InboundLayerInterface) {
-                    $request = $layer->in($request);
-                }
-
-                if (!$request instanceof Request) {
-                    throw new \RuntimeException(
-                        'Each inbound layer of the application pipeline must produce a Request type. ' .
-                        'The "' . $layer->getName() . '" layer returned ' . gettype($request) . '.'
-                    );
-                }
-            }
-
-            // Dispatch the request
-            $response = $this->dispatch($request);
-
+            // By the end of the inbound layer list, a response should have been obtained
             if (!$response instanceof Response) {
                 throw new \RuntimeException(
-                    'The controller action method must return a Response type. ' .
-                    'The controller returned ' . gettype($response) . '.'
+                    'At least one inbound layer must produce a Response instance. ' .
+                    'The final processed layer returned a "' . gettype($response) . '".'
                 );
             }
 
-            // Pass through layers back outwards
-            $reversedLayers = array_reverse($this->layers);
-            foreach ($reversedLayers as $layer) {
-
-                if ($layer instanceof OutboundLayerInterface) {
-                    $response = $layer->out($response);
-                }
-
-                if (!$response instanceof Response) {
-                    throw new \RuntimeException(
-                        'Each outbound layer of the application pipeline must produce a Response type. ' .
-                        'The "' . $layer->getName() . '" layer returned ' . gettype($response) . '.'
-                    );
-                }
-
-            }
-
+            // The response should now be processed by the outbound layers
+            $response = $this->processOutboundLayers($response);
 
         } catch(\Exception $exception) {
 
@@ -212,24 +235,5 @@ class App extends AbstractContainerAccessor
         }
 
         return $response;
-    }
-
-    /**
-     * Find a controller to handle the request instance.
-     *
-     * @param Request $request
-     * @return Response
-     * @throws \RuntimeException
-     */
-    private function dispatch(Request $request)
-    {
-        // Obtain the dispatcher service
-        $dispatcher = $this->container->get('dispatcher');
-
-        if ($dispatcher instanceof DispatcherInterface) {
-            return $dispatcher->dispatch($request);
-        } else {
-            throw new \RuntimeException('The dispatcher service must be an instance of \Veto\MVC\DispatcherInterface');
-        }
     }
 }
