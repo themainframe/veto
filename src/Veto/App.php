@@ -34,27 +34,7 @@ class App extends AbstractContainerAccessor
     /**
      * @var string
      */
-    public $name = 'Veto';
-
-    /**
-     * @var string
-     */
     public $version = "0.1.1";
-
-    /**
-     * @var object[]
-     */
-    private $layers;
-
-    /**
-     * @var \Veto\Collection\Bag
-     */
-    public $parameters;
-
-    /**
-     * @var Hive
-     */
-    public $config = array();
 
     /**
      * The base path of the application.
@@ -75,25 +55,25 @@ class App extends AbstractContainerAccessor
         $this->path = dirname(__DIR__);
 
         // Create the configuration hive and load the base config
-        $this->config = new Hive;
+        $config = new Hive;
 
         // Load the base configuration
-        $this->config->load($this->path . '/../config/base.yml');
+        $config->load($this->path . '/../config/base.yml');
 
         // Read configuration information
-        $this->config->load($configPath);
+        $config->load($configPath);
 
         // Initialise service container
         $this->container = new Container;
 
         // Register the kernel & configuration hive
-        $this->container->defineInstance('config', $this->config);
+        $this->container->defineInstance('config', $config);
         $this->container->defineInstance('app', $this);
         $this->container->defineInstance('container', $this->container);
 
         // Register services
         $this->registerServices(
-            isset($this->config['services']) ? $this->config['services'] : array()
+            isset($config['services']) ? $config['services'] : array()
         );
     }
 
