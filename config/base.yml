@@ -9,7 +9,7 @@ routes:
 
 services:
 
-    event_dispatcher:
+    dispatcher:
         class: \Veto\Event\Dispatcher
 
     controller:
