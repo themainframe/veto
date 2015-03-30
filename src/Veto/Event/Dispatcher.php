@@ -66,14 +66,15 @@ class Dispatcher
                 $this->sortListeners($eventName);
             }
 
-            foreach ($this->listeners[$eventName] as $listener) {
+            foreach ($this->listeners[$eventName] as $priorityGroup) {
+                foreach ($priorityGroup as $listener) {
+                    // Pass the event, the name and this dispatcher instance
+                    call_user_func($listener, $event, $eventName, $this);
 
-                // Pass the event, the name and this dispatcher instance
-                call_user_func($listener, $event, $eventName, $this);
-
-                // If the propagation was stopped, do not dispatch to any more listeners
-                if ($event->isPropagationStopped()) {
-                    break;
+                    // If the propagation was stopped, do not dispatch to any more listeners
+                    if ($event->isPropagationStopped()) {
+                        break;
+                    }
                 }
             }
         }
