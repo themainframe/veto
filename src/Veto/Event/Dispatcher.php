@@ -36,9 +36,10 @@ class Dispatcher
      *
      * @param string $eventName The name of the event to listen for
      * @param callable $callable The callable to dispatch events to
+     * @param int $priority Optional priority for the listener. Lower is higher.
      * @throws \InvalidArgumentException
      */
-    public function listen($eventName, $callable, $priority)
+    public function listen($eventName, $callable, $priority = 0)
     {
         if (!is_callable($callable)) {
             throw new \InvalidArgumentException(
