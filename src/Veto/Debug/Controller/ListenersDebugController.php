@@ -20,6 +20,9 @@ use Veto\MVC\AbstractController;
  */
 class ListenersDebugController extends AbstractController
 {
+    /**
+     * @return Response
+     */
     public function listenersDebug()
     {
         // The templates for showing exceptions are outside of the normal application

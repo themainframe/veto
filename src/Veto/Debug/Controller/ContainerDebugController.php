@@ -21,7 +21,10 @@ use Veto\MVC\AbstractController;
  */
 class ContainerDebugController extends AbstractController
 {
-    public function containerDebug(Request $request)
+    /**
+     * @return Response
+     */
+    public function containerDebug()
     {
         // The templates for showing exceptions are outside of the normal application
         // template path. It is therefore necessary to specify the path here.
