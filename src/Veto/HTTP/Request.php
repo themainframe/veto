@@ -38,7 +38,7 @@ class Request implements RequestInterface
     /**
      * The URI
      *
-     * @var string
+     * @var UriInterface
      */
     protected $uri;
 
