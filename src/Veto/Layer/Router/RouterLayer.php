@@ -12,7 +12,9 @@ namespace Veto\Layer\Router;
 
 use Veto\App;
 use Veto\Collection\Bag;
+use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
+use Veto\Event\Dispatcher;
 use Veto\HTTP\Request;
 use Veto\Layer\InboundLayerInterface;
 use Veto\Exception\ConfigurationException;
@@ -32,23 +34,35 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
      */
     protected $routes;
 
-    public function __construct(App $app)
+    /**
+     * The event dispatcher.
+     *
+     * @var \Veto\Event\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * Initialise the router, optionally from configuration
+     *
+     * @param Hive $config
+     * @param Dispatcher $dispatcher
+     * @throws ConfigurationException
+     */
+    public function __construct(Hive $config = null, Dispatcher $dispatcher = null)
     {
         $this->routes = new Bag();
+        $this->dispatcher = $dispatcher;
 
-        if (!$app->config->get('routes') ||
-            !is_array($app->config['routes'])) {
-            throw ConfigurationException::missingKey('routes');
-        }
-
-        foreach ($app->config['routes'] as $routeName => $route) {
-            $this->addRoute(
-                $routeName,
-                $route['url'],
-                isset($route['methods']) ? $route['methods'] : array(),
-                $route['controller'],
-                $route['action']
-            );
+        if (!is_null($config) && $config->get('routes') && is_array($config['routes'])) {
+            foreach ($config['routes'] as $routeName => $route) {
+                $this->addRoute(
+                    $routeName,
+                    $route['url'],
+                    isset($route['methods']) ? $route['methods'] : array(),
+                    $route['controller'],
+                    $route['action']
+                );
+            }
         }
     }
 
@@ -77,6 +91,11 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
 
             $placeholders = $route->matches($request);
             if ($placeholders !== false) {
+
+                // Dispatch a matched event
+                if (!is_null($this->dispatcher)) {
+                    $this->dispatcher->dispatch(RouterEvent::ROUTE_MATCHED, new RouterEvent($route, $this));
+                }
 
                 // Add the matched route's parameters to the request
                 $request = $request->withParameter('_controller', array(

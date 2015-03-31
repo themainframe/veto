@@ -7,6 +7,13 @@ routes:
         methods:
           - GET
 
+    _listeners_debug:
+        url: /_debug/listeners
+        controller: controller._listeners_debug
+        action: listenersDebug
+        methods:
+          - GET
+
 services:
 
     dispatcher:
@@ -18,6 +25,9 @@ services:
             one_shot: true
         _container_debug:
             class: \Veto\Debug\Controller\ContainerDebugController
+            one_shot: true
+        _listeners_debug:
+            class: \Veto\Debug\Controller\ListenersDebugController
             one_shot: true
 
     chain:

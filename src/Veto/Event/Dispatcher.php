@@ -81,6 +81,24 @@ class Dispatcher
     }
 
     /**
+     * Return the registered listeners for each event name
+     */
+    public function getListeners()
+    {
+        $listeners = array();
+
+        foreach ($this->listeners as $eventName => $priorities) {
+            foreach ($priorities as $priority => $priorityGroup) {
+                foreach ($priorityGroup as $eventListener) {
+                    $listeners[$eventName][] = $eventListener;
+                }
+            }
+        }
+
+        return $listeners;
+    }
+
+    /**
      * Sort the internal representation of the listener list for an event name.
      *
      * @param string $eventName

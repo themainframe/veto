@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Listeners Debug</title>
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+
+        body,html {
+            font-family: "pt sans", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0px 0px 20px 0px;
+            font-size: 200%;
+        }
+
+        h2 {
+            font-size: 120%;
+            margin: 0px 0px 20px 0px;
+        }
+
+        div.stack {
+            font-family: monospace;
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid #efefef;
+            border-radius: 6px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>
+    Event Listeners
+</h1>
+<div class="stack">
+    {% for name, listeners in eventNames %}
+        <strong>{{ name }}</strong><br />
+        &nbsp; --> {{ listeners|length }} listener{{ listeners|length > 1 ? 's' }}
+        <br /><br />
+    {% endfor %}
+</div>
+</body>
+</html>
