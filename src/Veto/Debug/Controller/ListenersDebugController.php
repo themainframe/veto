@@ -10,18 +10,17 @@
  */
 namespace Veto\Debug\Controller;
 
-use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\MVC\AbstractController;
 
 /**
  * ListenersDebugController
  *
- * Controller to render a debug dump of the registered services in the Veto Service Container.
+ * Controller to render a debug dump of the registered listeners on the event dispatcher service.
  */
 class ListenersDebugController extends AbstractController
 {
-    public function listenersDebug(Request $request)
+    public function listenersDebug()
     {
         // The templates for showing exceptions are outside of the normal application
         // template path. It is therefore necessary to specify the path here.
