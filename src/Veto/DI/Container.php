@@ -94,6 +94,25 @@ class Container
             return $this->instances[$serviceName];
         }
 
+        // Obtain the instance
+        $instance = $this->buildInstance($definition);
+
+        // Cache the instance if it isn't One Shot
+        if (!$definition->isOneShot()) {
+            $this->instances[$serviceName] = $instance;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Build and return a new instance of a service from a Definition instance.
+     *
+     * @param Definition $definition
+     * @return object
+     */
+    private function buildInstance(Definition $definition)
+    {
         // If any parameters are defined, resolve them
         $definedParameters = $definition->getParameters();
         $parameters = array();
@@ -119,11 +138,6 @@ class Container
         // If the service is a container accessor, provide this container to it
         if ($instance instanceof AbstractContainerAccessor) {
             $instance->setContainer($this);
-        }
-
-        // Cache the instance if it isn't One Shot
-        if (!$definition->isOneShot()) {
-            $this->instances[$serviceName] = $instance;
         }
 
         return $instance;
