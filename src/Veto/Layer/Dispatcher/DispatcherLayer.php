@@ -47,8 +47,7 @@ class DispatcherLayer extends AbstractContainerAccessor implements InboundLayerI
             throw new \RuntimeException('The request was not tagged by a router.', 500);
         }
 
-        $controller =  $this->container->get($controllerSpec['class']);
-        $controller->setContainer($this->container);
+        $controller = $this->container->get($controllerSpec['class']);
 
         if (!method_exists($controller, $controllerSpec['method'])) {
             throw new \RuntimeException(

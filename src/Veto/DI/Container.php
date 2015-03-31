@@ -116,6 +116,11 @@ class Container
             }
         }
 
+        // If the service is a container accessor, provide this container to it
+        if ($instance instanceof AbstractContainerAccessor) {
+            $instance->setContainer($this);
+        }
+
         // Cache the instance if it isn't One Shot
         if (!$definition->isOneShot()) {
             $this->instances[$serviceName] = $instance;
