@@ -122,4 +122,26 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->listen(self::EVENT_FOO, array($listener, self::LISTENER_METHOD));
         $dispatcher->dispatch(self::EVENT_FOO, $event);
     }
+
+    public function testPropagationDidStop()
+    {
+        $dispatcher = $this->createDispatcherInstance();
+
+        // Set up the event object
+        $event = new Event();
+
+        // Set up the first (called) listener
+        $dispatcher->listen(self::EVENT_FOO, function(Event $event) {
+            // Stop the propagation, the second listener should not fire
+            $event->setPropagationStopped(true);
+        });
+
+        // Set up the second (non-called) listener
+        $secondListener = $this->createListenerInstance();
+        $secondListener->expects($this->exactly(0))->method(self::LISTENER_METHOD);
+        $dispatcher->listen(self::EVENT_FOO, array($secondListener, self::LISTENER_METHOD));
+
+        // Dispatch the event
+        $dispatcher->dispatch(self::EVENT_FOO, $event);
+    }
 }
