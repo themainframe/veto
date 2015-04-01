@@ -1,5 +1,4 @@
-Veto [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/themainframe/veto/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/themainframe/veto/?branch=master)
-====
+# Veto &nbsp; [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/themainframe/veto/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/themainframe/veto/?branch=master) [![Build Status](https://travis-ci.org/themainframe/veto.svg?branch=master)](https://travis-ci.org/themainframe/veto)
 
 Veto is a super-lightweight PHP framework to make building web applications easier.
 
