@@ -45,6 +45,17 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $dispatcher->getListeners());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNonCallableListenerIsInvalid()
+    {
+        $dispatcher = $this->createDispatcherInstance();
+
+        // Try to register a non-callable dispatcher
+        $dispatcher->listen(self::EVENT_FOO, 'non callable');
+    }
+
     public function testListenerDidReceiveEvent()
     {
         $dispatcher = $this->createDispatcherInstance();
