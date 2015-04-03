@@ -52,9 +52,6 @@ class LayerChain extends AbstractContainerAccessor
 
                 // TODO: Split inbound and outbound priority for bidirectional layers
                 $priority = array_key_exists('priority', $layer) ? intval($layer['priority']) : 0;
-
-                // TODO: Layers might not be container accessors... check
-                $newLayer->setContainer($this->container);
                 $this->layers[$priority][$layerName] = $newLayer;
             }
 
