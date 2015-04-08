@@ -25,6 +25,7 @@ class Hive extends Tree
     /**
      * Load configuration data from a YAML file.
      *
+     * @todo Decouple this from the filesystem - make it accept a YAML string or stream instead
      * @throws ConfigurationException
      * @param string $path The path to the YAML configuration file.
      */
