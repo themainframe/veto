@@ -40,6 +40,16 @@ class UriTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testErrorCreateFromStringNotString()
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            '\Veto\HTTP\Uri::createFromString() argument must be a string'
+        );
+
+        Uri::createFromString(new \StdClass);
+    }
+
     public function testCreateFromStringWithNonStandardPort()
     {
 
