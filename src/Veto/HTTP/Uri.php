@@ -90,7 +90,7 @@ class Uri implements UriInterface
      *
      * @param string $scheme URI scheme
      * @param string $host URI host
-     * @param int $port URI port number
+     * @param int|null $port URI port number
      * @param string $path URI path
      * @param string $query URI query string
      * @param string $user URI user
