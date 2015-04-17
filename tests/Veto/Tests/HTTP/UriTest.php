@@ -40,6 +40,23 @@ class UriTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCreateFromStringObjectWithToString()
+    {
+        $originalUri = new Uri(
+            'http',
+            'example.com',
+            null,
+            '/foo/bar'
+        );
+
+        $newUri = Uri::createFromString($originalUri);
+
+        $this->assertEquals(
+            $originalUri,
+            $newUri
+        );
+    }
+
     public function testErrorCreateFromStringNotString()
     {
         $this->setExpectedException(
