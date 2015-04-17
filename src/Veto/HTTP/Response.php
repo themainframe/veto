@@ -11,7 +11,7 @@
 namespace Veto\HTTP;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamableInterface;
+use Psr\Http\Message\StreamInterface;
 use Veto\Collection\Bag;
 
 /**
@@ -59,22 +59,22 @@ class Response implements ResponseInterface
     /**
      * The response body
      *
-     * @var StreamableInterface
+     * @var StreamInterface
      */
     protected $body;
 
     /**
      * Create new HTTP response
      *
-     * @param StreamableInterface|string|null $body The response body
+     * @param StreamInterface|string|null $body The response body
      * @param int $status The response HTTP status code
      * @param Bag|null $headers The response HTTP headers
      * @param Bag|null $cookies The response cookies
      */
     public function __construct($body = null, $status = 200, Bag $headers = null, Bag $cookies = null)
     {
-        // If we're passed a StreamableInterface, use it as the response body
-        if ($body instanceof StreamableInterface) {
+        // If we're passed a StreamInterface, use it as the response body
+        if ($body instanceof StreamInterface) {
             $this->body = $body;
         } else {
 
@@ -342,7 +342,7 @@ class Response implements ResponseInterface
     /**
      * Gets the body of the message.
      *
-     * @return StreamableInterface Returns the body as a stream.
+     * @return StreamInterface Returns the body as a stream.
      */
     public function getBody()
     {
@@ -352,17 +352,17 @@ class Response implements ResponseInterface
     /**
      * Create a new instance, with the specified message body.
      *
-     * The body MUST be a StreamableInterface object.
+     * The body MUST be a StreamInterface object.
      *
      * This method MUST be implemented in such a way as to retain the
      * immutability of the message, and MUST return a new instance that has the
      * new body stream.
      *
-     * @param StreamableInterface $body Body.
+     * @param StreamInterface $body Body.
      * @return self
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamableInterface $body)
+    public function withBody(StreamInterface $body)
     {
         $clone = clone $this;
         $clone->body = $body;
