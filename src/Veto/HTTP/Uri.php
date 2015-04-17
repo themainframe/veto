@@ -119,17 +119,32 @@ class Uri implements UriInterface
      */
     public static function createFromString($uri)
     {
+        // Check for valid argument type
         if (!is_string($uri) && !method_exists($uri, '__toString')) {
             throw new \InvalidArgumentException(
                 '\Veto\HTTP\Uri::createFromString() argument must be a string'
             );
         }
 
-        $parts = parse_url($uri);
-        $scheme = isset($parts['scheme']) ? $parts['scheme'] : '';
+        // Normalize URL before validation as filter_var requires this for a valid url
+        $mungedUri = $uri;
+        if (!array_key_exists('scheme', parse_url($uri))) {
+            $mungedUri = 'http://' . $uri;
+        }
+
+        $parts = parse_url($mungedUri);
+
+        // Ensure that the URL is valid
+        if (!filter_var($mungedUri, FILTER_VALIDATE_URL) || !strlen($parts['host'])) {
+            throw new \InvalidArgumentException(
+                'Call to \\' . __METHOD__ . '() with invalid URI "' . $uri . '"'
+            );
+        }
+
+        $scheme = $parts['scheme'];
         $user = isset($parts['user']) ? $parts['user'] : '';
         $pass = isset($parts['pass']) ? $parts['pass'] : '';
-        $host = isset($parts['host']) ? $parts['host'] : '';
+        $host = $parts['host'];
         $port = isset($parts['port']) ? $parts['port'] : null;
         $path = isset($parts['path']) ? $parts['path'] : '';
         $query = isset($parts['query']) ? $parts['query'] : '';
