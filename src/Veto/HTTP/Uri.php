@@ -170,7 +170,8 @@ class Uri implements UriInterface
         $user = $environment->get('PHP_AUTH_USER', '');
         $password = $environment->get('PHP_AUTH_PW', '');
         $host = $environment->get('HTTP_HOST', $environment->get('SERVER_NAME'));
-        $port = (int)$environment->get('SERVER_PORT', 80);
+        $port = (int)$environment->get('SERVER_PORT', null);
+        $port = (80 === $port) ? null : $port; // UriInterfaces SHOULD return null for standard port
 
         // Path
         $requestScriptName = parse_url($environment->get('SCRIPT_NAME'), PHP_URL_PATH);
