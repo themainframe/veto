@@ -99,7 +99,26 @@ class CreateUriFromEnvironmentTest extends AbstractUriTest
                 'environment' => new Bag(array(
                     'HTTP_X_FORWARDED_PROTO' => 'https',
                     'HTTP_HOST' => 'example.com',
-                    'SERVER_PORT' => '80',
+                    'SERVER_PORT' => '443',
+                    'SCRIPT_NAME' => '/foo/bar',
+                    'REQUEST_URI' => '/foo/bar',
+                    'QUERY_STRING' => 'baz=bat'
+                )),
+                'validation_data' => array(
+                    'scheme' => 'https',
+                    'authority' => 'example.com',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat'
+                )
+            ),
+            'https' => array(
+                'environment' => new Bag(array(
+                    'HTTPS' => 'on',
+                    'HTTP_HOST' => 'example.com',
+                    'SERVER_PORT' => '443',
                     'SCRIPT_NAME' => '/foo/bar',
                     'REQUEST_URI' => '/foo/bar',
                     'QUERY_STRING' => 'baz=bat'

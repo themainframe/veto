@@ -86,11 +86,16 @@ class Uri implements UriInterface
     {
         $this->scheme = $scheme;
         $this->host = $host;
-        $this->port = $port;
         $this->path = empty($path) ? '/' : $path;
         $this->query = $query;
         $this->fragment = $fragment;
         $this->userInfo = $userInfo;
+
+        // Default ports SHOULD be null
+        $this->port = $port;
+        if ($this->isStandardPort($port, $scheme)) {
+            $this->port = null;
+        }
     }
 
     /**
@@ -164,7 +169,6 @@ class Uri implements UriInterface
         $password = $environment->get('PHP_AUTH_PW', '');
         $host = $environment->get('HTTP_HOST', $environment->get('SERVER_NAME'));
         $port = (int)$environment->get('SERVER_PORT', null);
-        $port = (80 === $port) ? null : $port; // UriInterfaces SHOULD return null for standard port
 
         // Path
         $path = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
@@ -242,7 +246,7 @@ class Uri implements UriInterface
         $userInfo = $this->getUserInfo();
         $host = $this->getHost();
         $port = $this->getPort();
-        $showPort = ($this->hasStandardPort() === false);
+        $showPort = !$this->isStandardPort($port, $this->scheme);
 
         return ($userInfo ? $userInfo . '@' : '') . $host . ($port && $showPort ? ':' . $port : '');
     }
@@ -527,11 +531,14 @@ class Uri implements UriInterface
     /**
      * Does this URI use a standard port?
      *
+     * @param int|null $port
+     * @param string $scheme
+     *
      * @return bool
      */
-    protected function hasStandardPort()
+    protected function isStandardPort($port, $scheme)
     {
-        return ($this->scheme === 'http' && $this->port === 80) ||
-            ($this->scheme === 'https' && $this->port === 443);
+        return ($scheme === 'http' && $port === 80) ||
+            ($scheme === 'https' && $port === 443);
     }
 }
