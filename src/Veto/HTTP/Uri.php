@@ -51,13 +51,6 @@ class Uri implements UriInterface
     protected $port;
 
     /**
-     * The URI base path
-     *
-     * @var string
-     */
-    protected $basePath = '';
-
-    /**
      * The URI path
      *
      * @var string
@@ -174,7 +167,7 @@ class Uri implements UriInterface
         $port = (80 === $port) ? null : $port; // UriInterfaces SHOULD return null for standard port
 
         // Path
-        $basePath = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
+        $path = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
 
         // Query string
         $queryString = $environment->get('QUERY_STRING', '');
@@ -185,7 +178,7 @@ class Uri implements UriInterface
         $userInfo = static::buildUserInfo($user, $password);
 
         // Build Uri
-        return new static($scheme, $host, $port, $basePath, $queryString, $fragment, $userInfo);
+        return new static($scheme, $host, $port, $path, $queryString, $fragment, $userInfo);
     }
 
     /**
@@ -388,8 +381,8 @@ class Uri implements UriInterface
     public function withUserInfo($user, $password = null)
     {
         $clone = clone $this;
-        $clone->user = $user;
-        $clone->password = $password ? $password : '';
+
+        $clone->userInfo = static::buildUserInfo($user, $password);
 
         return $clone;
     }
@@ -524,48 +517,11 @@ class Uri implements UriInterface
     {
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
-        $basePath = $this->getBasePath();
         $path = $this->getPath();
         $query = $this->getQuery();
         $fragment = $this->getFragment();
 
-        return ($scheme ? $scheme . '://' : '') . $authority . $basePath . $path . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
-    }
-
-
-    /**
-     * Retrieve the base path segment of the URI.
-     *
-     * This method MUST return a string; if no path is present it MUST return
-     * an empty string.
-     *
-     * @return string The base path segment of the URI.
-     */
-    public function getBasePath()
-    {
-        return $this->basePath;
-    }
-
-    /**
-     * Set base path
-     *
-     * @param  string $basePath
-     * @return self
-     */
-    public function withBasePath($basePath)
-    {
-        if (!is_string($basePath)) {
-            throw new \InvalidArgumentException('Uri path must be a string');
-        }
-
-        if (!empty($basePath)) {
-            $basePath = '/' . trim($basePath, '/');
-        }
-
-        $clone = clone $this;
-        $clone->basePath = $basePath;
-
-        return $clone;
+        return ($scheme ? $scheme . '://' : '') . $authority . $path . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
     }
 
     /**
