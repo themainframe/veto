@@ -142,14 +142,7 @@ class Uri implements UriInterface
         $query = isset($parts['query']) ? $parts['query'] : '';
         $fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
 
-        $userInfo = '';
-        if (strlen($user)) {
-            $userInfo = $user;
-
-            if (strlen($pass)) {
-                $userInfo .= ':' . $pass;
-            }
-        }
+        $userInfo = static::buildUserInfo($user, $pass);
 
         return new static($scheme, $host, $port, $path, $query, $fragment, $userInfo);
     }
@@ -205,6 +198,27 @@ class Uri implements UriInterface
         // Build Uri
         $uri = new static($scheme, $host, $port, $virtualPath, $queryString, $fragment, $user, $password);
         return $uri->withBasePath($basePath);
+    }
+
+    /**
+     * Build user info string from username/password components.
+     *
+     * @param string $username
+     * @param string $password
+     * @return string
+     */
+    protected static function buildUserInfo($username, $password)
+    {
+        $userInfo = '';
+        if (strlen($username)) {
+            $userInfo = $username;
+
+            if (strlen($password)) {
+                $userInfo .= ':' . $password;
+            }
+        }
+
+        return $userInfo;
     }
 
     /**
