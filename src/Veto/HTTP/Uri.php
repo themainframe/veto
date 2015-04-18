@@ -174,21 +174,7 @@ class Uri implements UriInterface
         $port = (80 === $port) ? null : $port; // UriInterfaces SHOULD return null for standard port
 
         // Path
-        $requestScriptName = parse_url($environment->get('SCRIPT_NAME'), PHP_URL_PATH);
-        $requestScriptDir = dirname($requestScriptName);
-        $requestUri = parse_url($environment->get('REQUEST_URI'), PHP_URL_PATH);
-        $basePath = '';
-        $virtualPath = $requestUri;
-
-        if (strpos($requestUri, $requestScriptName) === 0) {
-            $basePath = $requestScriptName;
-            $virtualPath = substr($requestUri, strlen($requestScriptName));
-        } elseif (strpos($requestUri, $requestScriptDir) === 0) {
-            $basePath = $requestScriptDir;
-            $virtualPath = substr($requestUri, strlen($requestScriptDir));
-        }
-
-        $virtualPath = '/' . ltrim($virtualPath, '/');
+        $basePath = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
 
         // Query string
         $queryString = $environment->get('QUERY_STRING', '');
@@ -196,9 +182,10 @@ class Uri implements UriInterface
         // Fragment
         $fragment = '';
 
+        $userInfo = static::buildUserInfo($user, $password);
+
         // Build Uri
-        $uri = new static($scheme, $host, $port, $virtualPath, $queryString, $fragment, $user, $password);
-        return $uri->withBasePath($basePath);
+        return new static($scheme, $host, $port, $basePath, $queryString, $fragment, $userInfo);
     }
 
     /**
