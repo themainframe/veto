@@ -102,10 +102,26 @@ class UriTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromStringWithUserInfo()
     {
+        $hostString = 'http://bob:password@example.com/foo/bar?baz=bat#qux';
 
+        $uri = Uri::createFromString($hostString);
+
+        $this->validateInstance(
+            array(
+                'scheme' => 'http',
+                'authority' => 'bob:password@example.com',
+                'user_info' => 'bob:password',
+                'host' => 'example.com',
+                'port' => null,
+                'path' => '/foo/bar',
+                'query' => 'baz=bat',
+                'fragment' => 'qux'
+            ),
+            $uri
+        );
     }
 
-    // TODO: Tests for path encoding (see docblocks)
+    // TODO: Tests for handling of path encoding (see UriInterface::getPath docblocks)
 
     /**
      * @param string[] $expected

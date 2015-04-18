@@ -30,18 +30,11 @@ class Uri implements UriInterface
     protected $scheme = '';
 
     /**
-     * The URI user (In user@password:...) type URIs
+     * The user info encoded in the url (for URLS like http://user@password:example.com
      *
-     * @var string
+     * @var string Either empty or encoded in form username[:password]
      */
-    protected $user = '';
-
-    /**
-     * The URI password (In user@password:...) type URIs
-     *
-     * @var string
-     */
-    protected $password = '';
+    protected $userInfo = '';
 
     /**
      * The URI host
@@ -93,10 +86,10 @@ class Uri implements UriInterface
      * @param int|null $port URI port number
      * @param string $path URI path
      * @param string $query URI query string
-     * @param string $user URI user
+     * @param string $userInfo (optional) username & password encoded in URI
      * @param string $password URI password
      */
-    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $user = '', $password = '')
+    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $userInfo = '')
     {
         $this->scheme = $scheme;
         $this->host = $host;
@@ -104,8 +97,7 @@ class Uri implements UriInterface
         $this->path = empty($path) ? '/' : $path;
         $this->query = $query;
         $this->fragment = $fragment;
-        $this->user = $user;
-        $this->password = $password;
+        $this->userInfo = $userInfo;
     }
 
     /**
@@ -150,7 +142,16 @@ class Uri implements UriInterface
         $query = isset($parts['query']) ? $parts['query'] : '';
         $fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
 
-        return new static($scheme, $host, $port, $path, $query, $fragment, $user, $pass);
+        $userInfo = '';
+        if (strlen($user)) {
+            $userInfo = $user;
+
+            if (strlen($pass)) {
+                $userInfo .= ':' . $pass;
+            }
+        }
+
+        return new static($scheme, $host, $port, $path, $query, $fragment, $userInfo);
     }
 
     /**
@@ -265,7 +266,7 @@ class Uri implements UriInterface
      */
     public function getUserInfo()
     {
-        // TODO: Implement getUserInfo() method.
+       return $this->userInfo;
     }
 
     /**
