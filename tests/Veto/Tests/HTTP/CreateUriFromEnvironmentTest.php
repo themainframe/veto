@@ -20,110 +20,100 @@ use Veto\HTTP\Uri;
  */
 class CreateUriFromEnvironmentTest extends AbstractUriTest
 {
-    public function testCreateFromEnvironment()
+    /**
+     * @dataProvider environmentProvider
+     *
+     * @param Bag $environment
+     * @param string[] $validationData
+     */
+    public function testCreateFromEnvironment(Bag $environment, array $validationData)
     {
-        $bag = new Bag(array(
-            'HTTP_HOST' => 'example.com',
-            'SERVER_PORT' => '80',
-            'SCRIPT_NAME' => '/foo/bar',
-            'REQUEST_URI' => '/foo/bar',
-            'QUERY_STRING' => 'baz=bat'
-        ));
-
-        $uri = Uri::createFromEnvironment($bag);
+        $uri = Uri::createFromEnvironment($environment);
 
         $this->validateInstance(
-            array(
-                'scheme' => 'http',
-                'authority' => 'example.com',
-                'user_info' => '',
-                'host' => 'example.com',
-                'port' => null,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat'
-            ),
+            $validationData,
             $uri
         );
     }
 
-    public function testCreateFromEnvironmentWithNonStandardPort()
+    public function environmentProvider()
     {
-        $bag = new Bag(array(
-            'HTTP_HOST' => 'example.com',
-            'SERVER_PORT' => '8080',
-            'SCRIPT_NAME' => '/foo/bar',
-            'REQUEST_URI' => '/foo/bar',
-            'QUERY_STRING' => 'baz=bat'
-        ));
-
-        $uri = Uri::createFromEnvironment($bag);
-
-        $this->validateInstance(
+        return array(
             array(
-                'scheme' => 'http',
-                'authority' => 'example.com:8080',
-                'user_info' => '',
-                'host' => 'example.com',
-                'port' => 8080,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat'
+                'environment' => new Bag(array(
+                    'HTTP_HOST' => 'example.com',
+                    'SERVER_PORT' => '80',
+                    'SCRIPT_NAME' => '/foo/bar',
+                    'REQUEST_URI' => '/foo/bar',
+                    'QUERY_STRING' => 'baz=bat'
+                )),
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'example.com',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat'
+                )
             ),
-            $uri
-        );
-    }
-
-    public function testCreateFromEnvironmentWithUserInfo()
-    {
-        $bag = new Bag(array(
-            'PHP_AUTH_USER' => 'bob',
-            'PHP_AUTH_PW' => 'password',
-            'HTTP_HOST' => 'example.com',
-            'SERVER_PORT' => '80',
-            'SCRIPT_NAME' => '/foo/bar',
-            'REQUEST_URI' => '/foo/bar',
-            'QUERY_STRING' => 'baz=bat'
-        ));
-
-        $uri = Uri::createFromEnvironment($bag);
-
-        $this->validateInstance(
-            array(
-                'scheme' => 'http',
-                'authority' => 'bob:password@example.com',
-                'user_info' => 'bob:password',
-                'host' => 'example.com',
-                'port' => null,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat'
+            'non-standard-port' => array(
+                'environment' => new Bag(array(
+                    'HTTP_HOST' => 'example.com',
+                    'SERVER_PORT' => '8080',
+                    'SCRIPT_NAME' => '/foo/bar',
+                    'REQUEST_URI' => '/foo/bar',
+                    'QUERY_STRING' => 'baz=bat'
+                )),
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'example.com:8080',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => 8080,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat'
+                )
             ),
-            $uri
-        );
-    }
-
-    public function testCreateFromEnvironmentWithXForwardedFor()
-    {
-        $bag = new Bag(array(
-            'HTTP_X_FORWARDED_PROTO' => 'https',
-            'HTTP_HOST' => 'example.com',
-            'SERVER_PORT' => '80',
-            'SCRIPT_NAME' => '/foo/bar',
-            'REQUEST_URI' => '/foo/bar',
-            'QUERY_STRING' => 'baz=bat'
-        ));
-
-        $uri = Uri::createFromEnvironment($bag);
-
-        $this->validateInstance(
-            array(
-                'scheme' => 'https',
-                'authority' => 'example.com',
-                'user_info' => '',
-                'host' => 'example.com',
-                'port' => null,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat'
+            'user-info' => array(
+                'environment' => new Bag(array(
+                    'PHP_AUTH_USER' => 'bob',
+                    'PHP_AUTH_PW' => 'password',
+                    'HTTP_HOST' => 'example.com',
+                    'SERVER_PORT' => '80',
+                    'SCRIPT_NAME' => '/foo/bar',
+                    'REQUEST_URI' => '/foo/bar',
+                    'QUERY_STRING' => 'baz=bat'
+                )),
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'bob:password@example.com',
+                    'user_info' => 'bob:password',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat'
+                )
             ),
-            $uri
+            'x-forwarded-for' => array(
+                'environment' => new Bag(array(
+                    'HTTP_X_FORWARDED_PROTO' => 'https',
+                    'HTTP_HOST' => 'example.com',
+                    'SERVER_PORT' => '80',
+                    'SCRIPT_NAME' => '/foo/bar',
+                    'REQUEST_URI' => '/foo/bar',
+                    'QUERY_STRING' => 'baz=bat'
+                )),
+                'validation_data' => array(
+                    'scheme' => 'https',
+                    'authority' => 'example.com',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat'
+                )
+            )
         );
     }
 }

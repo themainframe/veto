@@ -19,61 +19,18 @@ use Veto\HTTP\Uri;
  */
 class CreateUriFromStringTest extends AbstractUriTest
 {
-    public function testCreateFromString()
+    /**
+     * @dataProvider uriProvider
+     *
+     * @param string $uri
+     * @param string[] $validationData
+     */
+    public function testCreateFromString($uri, array $validationData)
     {
-        $hostString = 'http://example.com/foo/bar?baz=bat#qux';
-
-        $uri = Uri::createFromString($hostString);
+        $uri = Uri::createFromString($uri);
 
         $this->validateInstance(
-            array(
-                'scheme' => 'http',
-                'authority' => 'example.com',
-                'user_info' => '',
-                'host' => 'example.com',
-                'port' => null,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat',
-                'fragment' => 'qux'
-            ),
-            $uri
-        );
-    }
-
-    public function testCreateFromStringObjectWithToString()
-    {
-        $originalUri = new Uri(
-            'http',
-            'example.com',
-            null,
-            '/foo/bar'
-        );
-
-        $newUri = Uri::createFromString($originalUri);
-
-        $this->assertEquals(
-            $originalUri,
-            $newUri
-        );
-    }
-
-    public function testCreateFromStringWithNonStandardPort()
-    {
-        $hostString = 'http://example.com:8080/foo/bar?baz=bat#qux';
-
-        $uri = Uri::createFromString($hostString);
-
-        $this->validateInstance(
-            array(
-                'scheme' => 'http',
-                'authority' => 'example.com:8080',
-                'user_info' => '',
-                'host' => 'example.com',
-                'port' => 8080,
-                'path' => '/foo/bar',
-                'query' => 'baz=bat',
-                'fragment' => 'qux'
-            ),
+            $validationData,
             $uri
         );
     }
@@ -121,5 +78,68 @@ class CreateUriFromStringTest extends AbstractUriTest
         );
 
         Uri::createFromString($uri);
+    }
+
+    public function uriProvider()
+    {
+        return array(
+            'simple' => array(
+                'uri' => 'http://example.com/foo/bar?baz=bat#qux',
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'example.com',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat',
+                    'fragment' => 'qux'
+                )
+            ),
+            'object-to-string' => array(
+                'uri' => new Uri(
+                    'http',
+                    'example.com',
+                    null,
+                    '/foo/bar'
+                ),
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'example.com',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => '',
+                    'fragment' => ''
+                )
+            ),
+            'non-standard-port' => array(
+                'uri' => 'http://example.com:8080/foo/bar?baz=bat#qux',
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'example.com:8080',
+                    'user_info' => '',
+                    'host' => 'example.com',
+                    'port' => 8080,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat',
+                    'fragment' => 'qux'
+                )
+            ),
+            'user-info' => array(
+                'uri' => 'http://bob:password@example.com/foo/bar?baz=bat#qux',
+                'validation_data' => array(
+                    'scheme' => 'http',
+                    'authority' => 'bob:password@example.com',
+                    'user_info' => 'bob:password',
+                    'host' => 'example.com',
+                    'port' => null,
+                    'path' => '/foo/bar',
+                    'query' => 'baz=bat',
+                    'fragment' => 'qux'
+                )
+            )
+        );
     }
 }
