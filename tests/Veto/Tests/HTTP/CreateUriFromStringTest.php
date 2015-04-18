@@ -17,7 +17,7 @@ use Veto\HTTP\Uri;
 /**
  * Tests for creating PSR-7 compliant URI from URI string
  */
-class CreateUriFromStringTest extends \PHPUnit_Framework_TestCase
+class CreateUriFromStringTest extends AbstractUriTest
 {
     public function testCreateFromString()
     {
@@ -121,68 +121,5 @@ class CreateUriFromStringTest extends \PHPUnit_Framework_TestCase
         );
 
         Uri::createFromString($uri);
-    }
-
-    /**
-     * @param string[] $expected
-     * @param UriInterface $uri
-     */
-    private function validateInstance(array $expected, UriInterface $uri)
-    {
-        if (array_key_exists('scheme', $expected)) {
-            $this->assertEquals(
-                $expected['scheme'],
-                $uri->getScheme()
-            );
-        }
-
-        if (array_key_exists('authority', $expected)) {
-            $this->assertEquals(
-                $expected['authority'],
-                $uri->getAuthority()
-            );
-        }
-
-        if (array_key_exists('user_info', $expected)) {
-            $this->assertEquals(
-                $expected['user_info'],
-                $uri->getUserInfo()
-            );
-        }
-
-        if (array_key_exists('host', $expected)) {
-            $this->assertEquals(
-                $expected['host'],
-                $uri->getHost()
-            );
-        }
-
-        if (array_key_exists('port', $expected)) {
-            $this->assertEquals(
-                $expected['port'],
-                $uri->getPort()
-            );
-        }
-
-        if (array_key_exists('path', $expected)) {
-            $this->assertEquals(
-                $expected['path'],
-                $uri->getPath()
-            );
-        }
-
-        if (array_key_exists('query', $expected)) {
-            $this->assertEquals(
-                $expected['query'],
-                $uri->getQuery()
-            );
-        }
-
-        if (array_key_exists('fragment', $expected)) {
-            $this->assertEquals(
-                $expected['fragment'],
-                $uri->getFragment()
-            );
-        }
     }
 }
