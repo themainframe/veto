@@ -81,7 +81,23 @@ class UriTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromStringWithNonStandardPort()
     {
+        $hostString = 'http://example.com:8080/foo/bar?baz=bat#qux';
 
+        $uri = Uri::createFromString($hostString);
+
+        $this->validateInstance(
+            array(
+                'scheme' => 'http',
+                'authority' => 'example.com:8080',
+                'user_info' => '',
+                'host' => 'example.com',
+                'port' => 8080,
+                'path' => '/foo/bar',
+                'query' => 'baz=bat',
+                'fragment' => 'qux'
+            ),
+            $uri
+        );
     }
 
     public function testCreateFromStringWithUserInfo()
