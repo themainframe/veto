@@ -15,9 +15,9 @@ use Psr\Http\Message\UriInterface;
 use Veto\HTTP\Uri;
 
 /**
- * Tests for PSR-7 compliant Uri class.
+ * Tests for creating PSR-7 compliant URI from URI string
  */
-class UriTest extends \PHPUnit_Framework_TestCase
+class CreateUriFromStringTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateFromString()
     {
@@ -55,28 +55,6 @@ class UriTest extends \PHPUnit_Framework_TestCase
             $originalUri,
             $newUri
         );
-    }
-
-    public function testErrorCreateFromStringNotString()
-    {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            '\Veto\HTTP\Uri::createFromString() argument must be a string'
-        );
-
-        Uri::createFromString(new \StdClass);
-    }
-
-    public function testErrorCreateFromStringInvalidUri()
-    {
-        $uri = '';
-
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            'Call to \Veto\HTTP\Uri::createFromString() with invalid URI "' . $uri . '"'
-        );
-
-        Uri::createFromString($uri);
     }
 
     public function testCreateFromStringWithNonStandardPort()
@@ -122,6 +100,28 @@ class UriTest extends \PHPUnit_Framework_TestCase
     }
 
     // TODO: Tests for handling of path encoding (see UriInterface::getPath docblocks)
+
+    public function testErrorCreateFromStringNotString()
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            '\Veto\HTTP\Uri::createFromString() argument must be a string'
+        );
+
+        Uri::createFromString(new \StdClass);
+    }
+
+    public function testErrorCreateFromStringInvalidUri()
+    {
+        $uri = '';
+
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            'Call to \Veto\HTTP\Uri::createFromString() with invalid URI "' . $uri . '"'
+        );
+
+        Uri::createFromString($uri);
+    }
 
     /**
      * @param string[] $expected
