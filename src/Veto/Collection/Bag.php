@@ -57,7 +57,7 @@ class Bag implements \IteratorAggregate
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         } else {
-            return is_null($default) ? null : $default;
+            return $default;
         }
     }
 

@@ -30,18 +30,11 @@ class Uri implements UriInterface
     protected $scheme = '';
 
     /**
-     * The URI user (In user@password:...) type URIs
+     * The user info encoded in the url (for URLS like http://user@password:example.com
      *
-     * @var string
+     * @var string Either empty or encoded in form username[:password]
      */
-    protected $user = '';
-
-    /**
-     * The URI password (In user@password:...) type URIs
-     *
-     * @var string
-     */
-    protected $password = '';
+    protected $userInfo = '';
 
     /**
      * The URI host
@@ -56,13 +49,6 @@ class Uri implements UriInterface
      * @var int
      */
     protected $port;
-
-    /**
-     * The URI base path
-     *
-     * @var string
-     */
-    protected $basePath = '';
 
     /**
      * The URI path
@@ -90,22 +76,26 @@ class Uri implements UriInterface
      *
      * @param string $scheme URI scheme
      * @param string $host URI host
-     * @param int $port URI port number
+     * @param int|null $port URI port number
      * @param string $path URI path
      * @param string $query URI query string
-     * @param string $user URI user
+     * @param string $userInfo (optional) username & password encoded in URI
      * @param string $password URI password
      */
-    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $user = '', $password = '')
+    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $userInfo = '')
     {
         $this->scheme = $scheme;
         $this->host = $host;
-        $this->port = $port;
         $this->path = empty($path) ? '/' : $path;
         $this->query = $query;
         $this->fragment = $fragment;
-        $this->user = $user;
-        $this->password = $password;
+        $this->userInfo = $userInfo;
+
+        // Default ports SHOULD be null
+        $this->port = $port;
+        if ($this->isStandardPort($port, $scheme)) {
+            $this->port = null;
+        }
     }
 
     /**
@@ -119,23 +109,40 @@ class Uri implements UriInterface
      */
     public static function createFromString($uri)
     {
+        // Check for valid argument type
         if (!is_string($uri) && !method_exists($uri, '__toString')) {
             throw new \InvalidArgumentException(
                 '\Veto\HTTP\Uri::createFromString() argument must be a string'
             );
         }
 
-        $parts = parse_url($uri);
-        $scheme = isset($parts['scheme']) ? $parts['scheme'] : '';
+        // Normalize URL before validation as filter_var requires this for a valid url
+        $mungedUri = $uri;
+        if (!array_key_exists('scheme', parse_url($uri))) {
+            $mungedUri = 'http://' . $uri;
+        }
+
+        $parts = parse_url($mungedUri);
+
+        // Ensure that the URL is valid
+        if (!filter_var($mungedUri, FILTER_VALIDATE_URL) || !strlen($parts['host'])) {
+            throw new \InvalidArgumentException(
+                'Call to \\' . __METHOD__ . '() with invalid URI "' . $uri . '"'
+            );
+        }
+
+        $scheme = $parts['scheme'];
         $user = isset($parts['user']) ? $parts['user'] : '';
         $pass = isset($parts['pass']) ? $parts['pass'] : '';
-        $host = isset($parts['host']) ? $parts['host'] : '';
+        $host = $parts['host'];
         $port = isset($parts['port']) ? $parts['port'] : null;
         $path = isset($parts['path']) ? $parts['path'] : '';
         $query = isset($parts['query']) ? $parts['query'] : '';
         $fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
 
-        return new static($scheme, $host, $port, $path, $query, $fragment, $user, $pass);
+        $userInfo = static::buildUserInfo($user, $pass);
+
+        return new static($scheme, $host, $port, $path, $query, $fragment, $userInfo);
     }
 
     /**
@@ -161,24 +168,10 @@ class Uri implements UriInterface
         $user = $environment->get('PHP_AUTH_USER', '');
         $password = $environment->get('PHP_AUTH_PW', '');
         $host = $environment->get('HTTP_HOST', $environment->get('SERVER_NAME'));
-        $port = (int)$environment->get('SERVER_PORT', 80);
+        $port = (int)$environment->get('SERVER_PORT', null);
 
         // Path
-        $requestScriptName = parse_url($environment->get('SCRIPT_NAME'), PHP_URL_PATH);
-        $requestScriptDir = dirname($requestScriptName);
-        $requestUri = parse_url($environment->get('REQUEST_URI'), PHP_URL_PATH);
-        $basePath = '';
-        $virtualPath = $requestUri;
-
-        if (strpos($requestUri, $requestScriptName) === 0) {
-            $basePath = $requestScriptName;
-            $virtualPath = substr($requestUri, strlen($requestScriptName));
-        } elseif (strpos($requestUri, $requestScriptDir) === 0) {
-            $basePath = $requestScriptDir;
-            $virtualPath = substr($requestUri, strlen($requestScriptDir));
-        }
-
-        $virtualPath = '/' . ltrim($virtualPath, '/');
+        $path = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
 
         // Query string
         $queryString = $environment->get('QUERY_STRING', '');
@@ -186,9 +179,31 @@ class Uri implements UriInterface
         // Fragment
         $fragment = '';
 
+        $userInfo = static::buildUserInfo($user, $password);
+
         // Build Uri
-        $uri = new static($scheme, $host, $port, $virtualPath, $queryString, $fragment, $user, $password);
-        return $uri->withBasePath($basePath);
+        return new static($scheme, $host, $port, $path, $queryString, $fragment, $userInfo);
+    }
+
+    /**
+     * Build user info string from username/password components.
+     *
+     * @param string $username
+     * @param string $password
+     * @return string
+     */
+    protected static function buildUserInfo($username, $password)
+    {
+        $userInfo = '';
+        if (strlen($username)) {
+            $userInfo = $username;
+
+            if (strlen($password)) {
+                $userInfo .= ':' . $password;
+            }
+        }
+
+        return $userInfo;
     }
 
     /**
@@ -231,7 +246,7 @@ class Uri implements UriInterface
         $userInfo = $this->getUserInfo();
         $host = $this->getHost();
         $port = $this->getPort();
-        $showPort = ($this->hasStandardPort() === false);
+        $showPort = !$this->isStandardPort($port, $this->scheme);
 
         return ($userInfo ? $userInfo . '@' : '') . $host . ($port && $showPort ? ':' . $port : '');
     }
@@ -250,7 +265,7 @@ class Uri implements UriInterface
      */
     public function getUserInfo()
     {
-        // TODO: Implement getUserInfo() method.
+       return $this->userInfo;
     }
 
     /**
@@ -370,8 +385,8 @@ class Uri implements UriInterface
     public function withUserInfo($user, $password = null)
     {
         $clone = clone $this;
-        $clone->user = $user;
-        $clone->password = $password ? $password : '';
+
+        $clone->userInfo = static::buildUserInfo($user, $password);
 
         return $clone;
     }
@@ -506,58 +521,24 @@ class Uri implements UriInterface
     {
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
-        $basePath = $this->getBasePath();
         $path = $this->getPath();
         $query = $this->getQuery();
         $fragment = $this->getFragment();
 
-        return ($scheme ? $scheme . '://' : '') . $authority . $basePath . $path . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
-    }
-
-
-    /**
-     * Retrieve the base path segment of the URI.
-     *
-     * This method MUST return a string; if no path is present it MUST return
-     * an empty string.
-     *
-     * @return string The base path segment of the URI.
-     */
-    public function getBasePath()
-    {
-        return $this->basePath;
-    }
-
-    /**
-     * Set base path
-     *
-     * @param  string $basePath
-     * @return self
-     */
-    public function withBasePath($basePath)
-    {
-        if (!is_string($basePath)) {
-            throw new \InvalidArgumentException('Uri path must be a string');
-        }
-
-        if (!empty($basePath)) {
-            $basePath = '/' . trim($basePath, '/');
-        }
-
-        $clone = clone $this;
-        $clone->basePath = $basePath;
-
-        return $clone;
+        return ($scheme ? $scheme . '://' : '') . $authority . $path . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
     }
 
     /**
      * Does this URI use a standard port?
      *
+     * @param int|null $port
+     * @param string $scheme
+     *
      * @return bool
      */
-    protected function hasStandardPort()
+    protected function isStandardPort($port, $scheme)
     {
-        return ($this->scheme === 'http' && $this->port === 80) ||
-            ($this->scheme === 'https' && $this->port === 443);
+        return ($scheme === 'http' && $port === 80) ||
+            ($scheme === 'https' && $port === 443);
     }
 }
