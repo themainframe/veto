@@ -1,22 +1,20 @@
 <?php
-
 /**
- * PHP Version 5.3
+ * Veto.
+ * PHP Microframework.
  *
- * @copyright   (c) 2015 brian ridley
- * @author      brian ridley <ptlis@ptlis.net>
- * @license     http://opensource.org/licenses/MIT MIT
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * @author brian ridley <ptlis@ptlis.net>
+ * @copyright Damien Walsh 2013-2015
+ * @version 0.1
+ * @package veto
  */
 
-namespace Veto\Tests\HTTP;
+namespace Veto\Tests\HTTP\Uri;
 
 
 use Veto\HTTP\Uri;
 
-class MutateTest extends \PHPUnit_Framework_TestCase
+class MutateUriTest extends \PHPUnit_Framework_TestCase
 {
     public function testWithScheme()
     {
