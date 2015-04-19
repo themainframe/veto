@@ -57,6 +57,13 @@ class Request implements RequestInterface
     protected $queryParams;
 
     /**
+     * The server environment variables
+     *
+     * @var Bag
+     */
+    protected $serverParams;
+
+    /**
      * The cookies
      *
      * @var Bag
@@ -108,7 +115,22 @@ class Request implements RequestInterface
         $this->cookies = $cookies;
         $this->serverParams = $serverParams;
         $this->parameters = new Bag();
+        $this->queryParams = new Bag();
         $this->body = $body;
+    }
+
+    /**
+     * Deep-copy any associated objects when cloning.
+     */
+    public function __clone()
+    {
+        $this->headers = clone $this->headers;
+        $this->cookies = clone $this->cookies;
+        $this->parameters = clone $this->parameters;
+        $this->body = clone $this->body;
+        $this->queryParams = clone $this->queryParams;
+        $this->serverParams = clone $this->serverParams;
+        $this->uri = clone $this->uri;
     }
 
     /**

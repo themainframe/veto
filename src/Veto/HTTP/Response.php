@@ -93,6 +93,16 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Deep-copy any associated objects when cloning.
+     */
+    public function __clone()
+    {
+        $this->headers = clone $this->headers;
+        $this->cookies = clone $this->cookies;
+        $this->body = clone $this->body;
+    }
+
+    /**
      * Send both headers and content.
      */
     public function send()
