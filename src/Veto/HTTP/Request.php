@@ -485,8 +485,6 @@ class Request implements RequestInterface
     {
         // Preserve previous host information if omitted from the new uri or if $preserveHost is true
         if (!strlen($uri->getHost()) || $preserveHost) {
-            // TODO: Pass password? We have no easy way to retrieve it as it's not part of the UriInterface
-            // This wasn't a problem when cloning, but due to preserving host requirement this is now a problem
             $uri = new Uri(
                 $uri->getScheme(),
                 $uri->getHost(),
