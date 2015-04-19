@@ -10,14 +10,14 @@
  */
 namespace Veto\HTTP;
 
-use Psr\Http\Message\StreamableInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * A HTTP Message Body, according to PSR-7.
  *
  * @since 0.1
  */
-class MessageBody implements StreamableInterface
+class MessageBody implements StreamInterface
 {
     /**
      * Modes in which a stream is readable

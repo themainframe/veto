@@ -11,7 +11,7 @@
 namespace Veto\HTTP;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamableInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Veto\Collection\Bag;
 
@@ -92,7 +92,7 @@ class Request implements RequestInterface
      * @param HeaderBag $headers The request headers collection
      * @param Bag $cookies The request cookies collection
      * @param Bag $serverParams The server environment variables
-     * @param StreamableInterface $body The request body object
+     * @param StreamInterface $body The request body object
      */
     public function __construct(
         $method,
@@ -100,7 +100,7 @@ class Request implements RequestInterface
         HeaderBag $headers,
         Bag $cookies,
         Bag $serverParams,
-        StreamableInterface $body
+        StreamInterface $body
     ) {
         $this->method = $method;
         $this->uri = $uri;
@@ -246,7 +246,7 @@ class Request implements RequestInterface
     /**
      * Gets the body of the message.
      *
-     * @return StreamableInterface Returns the body as a stream.
+     * @return StreamInterface Returns the body as a stream.
      */
     public function getBody()
     {
@@ -256,17 +256,17 @@ class Request implements RequestInterface
     /**
      * Create a new instance, with the specified message body.
      *
-     * The body MUST be a StreamableInterface object.
+     * The body MUST be a StreamInterface object.
      *
      * This method MUST be implemented in such a way as to retain the
      * immutability of the message, and MUST return a new instance that has the
      * new body stream.
      *
-     * @param StreamableInterface $body Body.
+     * @param StreamInterface $body Body.
      * @return self
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamableInterface $body)
+    public function withBody(StreamInterface $body)
     {
         $clone = clone $this;
         $clone->body = $body;
@@ -318,19 +318,23 @@ class Request implements RequestInterface
      * Extends MessageInterface::getHeaderLines() to provide request-specific
      * behavior.
      *
-     * Retrieves a header by the given case-insensitive name as an array of strings.
+     * This method returns all of the header values of the given
+     * case-insensitive header name as a string concatenated together using
+     * a comma.
      *
      * This method acts exactly like MessageInterface::getHeaderLines(), with
      * one behavioral change: if the Host header is requested, but has
      * not been previously set, the method MUST attempt to pull the host
-     * segment of the composed URI, if present.
+     * component of the composed URI, if present.
      *
-     * @see MessageInterface::getHeaderLines()
+     * @see MessageInterface::getHeaderLine()
      * @see UriInterface::getHost()
      * @param string $name Case-insensitive header field name.
-     * @return string[]
+     * @return string|null A string of values as provided for the given header
+     *    concatenated together using a comma. If the header does not appear in
+     *    the message, this method MUST return a null value.
      */
-    public function getHeaderLines($name)
+    public function getHeaderLine($name)
     {
         return $this->headers->get($name);
     }
@@ -453,18 +457,47 @@ class Request implements RequestInterface
     }
 
     /**
-     * Create a new instance with the provided URI.
+     * Returns an instance with the provided URI.
+     *
+     * This method will update the Host header of the returned request by
+     * default if the URI contains a host component. If the URI does not
+     * contain a host component, any pre-existing Host header will be carried
+     * over to the returned request.
+     *
+     * You can opt-in to preserving the original state of the Host header by
+     * setting `$preserveHost` to `true`. When `$preserveHost` is set to
+     * `true`, the returned request will not update the Host header of the
+     * returned message -- even if the message contains no Host header. This
+     * means that a call to `getHeader('Host')` on the original request MUST
+     * equal the return value of a call to `getHeader('Host')` on the returned
+     * request.
      *
      * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return a new instance that has the
+     * immutability of the message, and MUST return an instance that has the
      * new UriInterface instance.
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
      * @param UriInterface $uri New request URI to use.
+     * @param bool $preserveHost Preserve the original state of the Host header.
      * @return self
      */
-    public function withUri(UriInterface $uri)
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
+        // Preserve previous host information if omitted from the new uri or if $preserveHost is true
+        if (!strlen($uri->getHost()) || $preserveHost) {
+            // TODO: Pass password? We have no easy way to retrieve it as it's not part of the UriInterface
+            // This wasn't a problem when cloning, but due to preserving host requirement this is now a problem
+            $uri = new Uri(
+                $uri->getScheme(),
+                $uri->getHost(),
+                $uri->getPort(),
+                $uri->getPath(),
+                $uri->getQuery(),
+                $uri->getFragment(),
+                $uri->getUserInfo()
+            );
+        }
+
         $clone = clone $this;
         $clone->uri = $uri;
 
