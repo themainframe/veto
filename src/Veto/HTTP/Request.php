@@ -87,7 +87,7 @@ class Request implements RequestInterface
     /**
      * The request body
      *
-     * @var string
+     * @var StreamInterface
      */
     protected $body;
 
