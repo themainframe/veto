@@ -105,6 +105,7 @@ class Uri implements UriInterface
      *
      * @param  string $uri Complete Uri string (i.e., https://user:pass@host:443/path?query)
      * @link https://github.com/slimphp/Slim/
+     * @throws \InvalidArgumentException
      * @return self
      */
     public static function createFromString($uri)
@@ -139,7 +140,6 @@ class Uri implements UriInterface
         $path = isset($parts['path']) ? $parts['path'] : '';
         $query = isset($parts['query']) ? $parts['query'] : '';
         $fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
-
         $userInfo = static::buildUserInfo($user, $pass);
 
         return new static($scheme, $host, $port, $path, $query, $fragment, $userInfo);
