@@ -171,7 +171,8 @@ class Uri implements UriInterface
         $port = (int)$environment->get('SERVER_PORT', null);
 
         // Path
-        $path = '/' . ltrim($environment->get('SCRIPT_NAME', ''), '/');
+        $requestUri = parse_url($environment->get('REQUEST_URI'), PHP_URL_PATH);
+        $path = '/' . ltrim($requestUri, '/');
 
         // Query string
         $queryString = $environment->get('QUERY_STRING', '');
