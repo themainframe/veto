@@ -29,9 +29,3 @@ services:
         _listeners_debug:
             class: \Veto\Debug\Controller\ListenersDebugController
             one_shot: true
-
-    chain:
-        class: \Veto\Layer\LayerChain
-        parameters:
-          - @config
-          - @container

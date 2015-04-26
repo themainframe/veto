@@ -10,10 +10,7 @@
  */
 namespace Veto\Layer;
 
-use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
-use Veto\DI\Container;
-use Veto\Exception\ConfigurationException;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 
@@ -25,39 +22,33 @@ use Veto\HTTP\Response;
 class LayerChain extends AbstractContainerAccessor
 {
     /**
-     * An associative array of layers that are configured
+     * An associative, 2D array of layers that are configured.
+     * Layers are stored here keyed by priority then name.
      *
      * @var array
      */
     private $layers = array();
 
     /**
-     * @param Hive $config
-     * @param Container $container
-     * @throws ConfigurationException
+     * Add a layer to this LayerChain.
+     *
+     * @param object $layer
+     * @param int $priority
      */
-    public function __construct(Hive $config, Container $container)
+    public function addLayer($layer, $priority = 0)
     {
-        $this->container = $container;
-
-        // Register layers from configuration
-        if (isset($config['layers']) && is_array($config['layers'])) {
-            foreach ($config['layers'] as $layerName => $layer) {
-
-                if (!array_key_exists('service', $layer)) {
-                    throw ConfigurationException::missingSubkey('layer', 'service');
-                }
-
-                $newLayer = $this->container->get($layer['service']);
-
-                // TODO: Split inbound and outbound priority for bidirectional layers
-                $priority = array_key_exists('priority', $layer) ? intval($layer['priority']) : 0;
-                $this->layers[$priority][$layerName] = $newLayer;
-            }
-
-            // Sort layers by priority
-            ksort($this->layers);
+        // Enforce the type of $layer
+        if (!($layer instanceof InboundLayerInterface || $layer instanceof OutboundLayerInterface)) {
+            throw new \InvalidArgumentException(
+                'Argument 1 of '  . __CLASS__ . '::' . __METHOD__ .
+                ' must be either an InboundLayerInterface or an OutboundLayerInterface instance.'
+            );
         }
+
+        $this->layers[$priority][] = $layer;
+
+        // TODO: Improve the efficiency of this by _not_ sorting after every insertion
+        ksort($this->layers);
     }
 
     /**

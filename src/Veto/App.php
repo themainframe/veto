@@ -19,6 +19,7 @@ use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\Layer\AbstractLayer;
 use Veto\Layer\InboundLayerInterface;
+use Veto\Layer\LayerChainBuilder;
 use Veto\Layer\OutboundLayerInterface;
 use Veto\MVC\DispatcherInterface;
 
@@ -75,6 +76,10 @@ class App extends AbstractContainerAccessor
         $this->registerServices(
             isset($config['services']) ? $config['services'] : array()
         );
+
+        // Set up layers
+        $layerChain = LayerChainBuilder::initWithConfigurationAndContainer($config, $this->container);
+        $this->container->defineInstance('chain', $layerChain);
     }
 
     /**
