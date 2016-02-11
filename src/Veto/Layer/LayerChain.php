@@ -58,6 +58,13 @@ class LayerChain extends AbstractContainerAccessor
      */
     public function processLayers(Request $request)
     {
+        // There must be at least one inbound layer, otherwise our Request will never become a Response
+        if (0 === count($this->layers)) {
+            throw new \RuntimeException(
+                'At least one layer must be defined in order to handle requests.'
+            );
+        }
+
         $response = $this->processInboundLayers($request);
 
         // By the end of the inbound layer list, a response should have been obtained
