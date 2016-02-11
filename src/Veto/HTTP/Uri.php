@@ -79,8 +79,8 @@ class Uri implements UriInterface
      * @param int|null $port URI port number
      * @param string $path URI path
      * @param string $query URI query string
+     * @param string $fragment
      * @param string $userInfo (optional) username & password encoded in URI
-     * @param string $password URI password
      */
     public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $userInfo = '')
     {
