@@ -10,6 +10,8 @@
  */
 namespace Veto\DI;
 
+use Veto\Collection\Bag;
+
 /**
  * Container
  *
@@ -30,6 +32,19 @@ class Container
      * @var object[]
      */
     private $instances;
+
+    /**
+     * @var Bag
+     */
+    private $parameterBag;
+
+    /**
+     * Create a new Container instance.
+     */
+    public function __construct()
+    {
+        $this->parameterBag = new Bag;
+    }
 
     /**
      * Define a service within the container, optionally providing a pre-existing instance of the service.
@@ -106,41 +121,47 @@ class Container
     }
 
     /**
-     * Build and return a new instance of a service from a Definition instance.
+     * Get a parameter stored in the container.
      *
-     * @param Definition $definition
-     * @return object
+     * @param string $name The parameter name
+     * @return mixed|null
      */
-    private function buildInstance(Definition $definition)
+    public function getParameter($name)
     {
-        // If any parameters are defined, resolve them
-        $definedParameters = $definition->getParameters();
-        $parameters = array();
+        return $this->parameterBag->get($name);
+    }
 
-        if (is_array($definedParameters) && count($definedParameters) > 0) {
-            $parameters = $this->resolveParameters($definedParameters);
-        }
+    /**
+     * Save a parameter into the container.
+     *
+     * @param string $name The parameter name
+     * @param mixed $value
+     * @return $this
+     */
+    public function setParameter($name, $value)
+    {
+        return $this->parameterBag->add($name, $value);
+    }
 
-        $reflectionClass = new \ReflectionClass($definition->getClassName());
-        $instance = $reflectionClass->newInstanceArgs($parameters);
+    /**
+     * Checks if a parameter exists.
+     *
+     * @param string $name The parameter name
+     * @return bool The presence of the named parameter in the container
+     */
+    public function hasParameter($name)
+    {
+        return $this->parameterBag->has($name);
+    }
 
-        // Process any calls that have been defined
-        if (is_array($definition->getCalls())) {
-            foreach ($definition->getCalls() as $method => $arguments) {
-                if ($reflectionClass->hasMethod($method)) {
-                    // Resolve the arguments as parameters
-                    $resolvedArguments = $this->resolveParameters($arguments);
-                    call_user_func_array(array($instance, $method), $resolvedArguments);
-                }
-            }
-        }
-
-        // If the service is a container accessor, provide this container to it
-        if ($instance instanceof AbstractContainerAccessor) {
-            $instance->setContainer($this);
-        }
-
-        return $instance;
+    /**
+     * Return the bag used for storing parameters in the container.
+     *
+     * @return Bag
+     */
+    public function getParameterBag()
+    {
+        return $this->parameterBag;
     }
 
     /**
@@ -174,24 +195,68 @@ class Container
     }
 
     /**
-     * Resolve an array of parameter names into their actual instances.
+     * Build and return a new instance of a service from a Definition instance.
      *
-     * @param array $parameters
+     * @param Definition $definition
+     * @return object
+     */
+    private function buildInstance(Definition $definition)
+    {
+        // If any parameters are defined, resolve them
+        $definedParameters = $definition->getParameters();
+        $parameters = array();
+
+        if (is_array($definedParameters) && count($definedParameters) > 0) {
+            $parameters = $this->resolveArguments($definedParameters);
+        }
+
+        $reflectionClass = new \ReflectionClass($definition->getClassName());
+        $instance = $reflectionClass->newInstanceArgs($parameters);
+
+        // Process any calls that have been defined
+        if (is_array($definition->getCalls())) {
+            foreach ($definition->getCalls() as $method => $arguments) {
+                if ($reflectionClass->hasMethod($method)) {
+                    // Resolve the arguments as instances or parameters
+                    $resolvedArguments = $this->resolveArguments($arguments);
+                    call_user_func_array(array($instance, $method), $resolvedArguments);
+                }
+            }
+        }
+
+        // If the service is a container accessor, provide this container to it
+        if ($instance instanceof AbstractContainerAccessor) {
+            $instance->setContainer($this);
+        }
+
+        return $instance;
+
+    }
+
+    /**
+     * Resolve an array of arguments into their actual instances or parameter values.
+     *
+     * @param array $arguments
      * @return array
      */
-    private function resolveParameters(array $parameters)
+    private function resolveArguments(array $arguments)
     {
         $resolvedParameters = array();
 
-        foreach ($parameters as $parameter) {
+        foreach ($arguments as $argument) {
 
-            // Does this parameter look like a reference to a service (@servicename) ?
-            if (is_string($parameter) && strlen($parameter) > 0 && $parameter[0] == '@') {
-                $bareParameterName = substr($parameter, 1);
-                $resolvedParameters[] = $this->get($bareParameterName);
-            } else {
-                $resolvedParameters[] = $parameter;
+            // Does $argument look like a reference to a service (@servicename) or a parameter (%paramname%)?
+            if (is_string($argument) && strlen($argument) > 0) {
+                if ($argument[0] == '@') {
+                    $bareParameterName = substr($argument, 1);
+                    $argument = $this->get($bareParameterName);
+                } elseif ($argument[0] == '%' && $argument[strlen($argument) - 1] == '%') {
+                    $bareParameterName = substr($argument, 1, -1);
+                    $argument = $this->getParameter($bareParameterName);
+                }
             }
+
+            $resolvedParameters[] = $argument;
         }
 
         return $resolvedParameters;

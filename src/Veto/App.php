@@ -14,14 +14,9 @@ use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\DI\Definition;
-use Veto\Exception\ConfigurationException;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
-use Veto\Layer\AbstractLayer;
-use Veto\Layer\InboundLayerInterface;
 use Veto\Layer\LayerChainBuilder;
-use Veto\Layer\OutboundLayerInterface;
-use Veto\MVC\DispatcherInterface;
 
 /**
  * App
@@ -38,28 +33,17 @@ class App extends AbstractContainerAccessor
     public $version = "0.1.1";
 
     /**
-     * The base path of the application.
-     * Resolves to the directory that contains the kernel class file (App.php).
-     *
-     * @var string
-     */
-    public $path;
-
-    /**
      * Create a new application instance.
      *
      * @param string $configPath The path to the JSON configuration file.
      */
     public function __construct($configPath)
     {
-        // Set the base directory
-        $this->path = dirname(__DIR__);
-
         // Create the configuration hive and load the base config
         $config = new Hive;
 
         // Load the base configuration
-        $config->load($this->path . '/../config/base.yml');
+        $config->load(dirname(__DIR__) . '/../config/base.yml');
 
         // Read configuration information
         $config->load($configPath);
@@ -72,14 +56,25 @@ class App extends AbstractContainerAccessor
         $this->container->defineInstance('app', $this);
         $this->container->defineInstance('container', $this->container);
 
-        // Register services
-        $this->registerServices(
-            isset($config['services']) ? $config['services'] : array()
-        );
+        // Register parameters & services
+        $this->registerParameters(isset($config['parameters']) ? $config['parameters'] : array());
+        $this->registerServices(isset($config['services']) ? $config['services'] : array());
 
         // Set up layers
         $layerChain = LayerChainBuilder::initWithConfigurationAndContainer($config, $this->container);
         $this->container->defineInstance('chain', $layerChain);
+    }
+
+    /**
+     * Register an array of parameters with the service container.
+     *
+     * @param array $parameters The parameters to register
+     */
+    private function registerParameters(array $parameters)
+    {
+        foreach ($parameters as $name => $value) {
+            $this->container->setParameter($name, $value);
+        }
     }
 
     /**
