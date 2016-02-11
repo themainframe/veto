@@ -134,7 +134,7 @@ class LayerChain extends AbstractContainerAccessor
                 if (!$result instanceof Response) {
                     throw new \RuntimeException(
                         'Each outbound layer of the chain must produce a Response type. ' .
-                        'The "' . $layer->getName() . '" layer returned ' . gettype($response) . '.'
+                        'The "' . $layerName . '" layer returned ' . gettype($response) . '.'
                     );
                 }
             }
