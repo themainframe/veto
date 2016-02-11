@@ -208,7 +208,7 @@ class Route
     }
 
     /**
-     * @param \string[] $methods
+     * @param string[] $methods
      */
     public function setMethods($methods)
     {
@@ -216,7 +216,7 @@ class Route
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getMethods()
     {
