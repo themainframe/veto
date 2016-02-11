@@ -41,6 +41,8 @@
         <strong>{{ name }}</strong><br />
         &nbsp; --> {{ listeners|length }} listener{{ listeners|length > 1 ? 's' }}
         <br /><br />
+    {% else %}
+        <strong>There are no event listeners registered with the dispatcher.</strong>
     {% endfor %}
 </div>
 </body>

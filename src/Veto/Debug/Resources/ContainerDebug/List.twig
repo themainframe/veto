@@ -41,6 +41,8 @@
         <strong>{{ name }}</strong><br />
         &nbsp; --> {{ service.className }}
         <br /><br />
+    {% else %}
+        <strong>There are no services defined within the container.</strong>
     {% endfor %}
 </div>
 </body>
