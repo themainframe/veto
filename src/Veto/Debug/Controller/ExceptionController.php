@@ -31,10 +31,8 @@ class ExceptionController extends AbstractController
     {
         // The templates for showing exceptions are outside of the normal application
         // template path. It is therefore necessary to specify the path here.
-
-        // TODO: Improve this mechanic.
         $this->get('templating')->addPath(
-            $this->get('app')->path . '/Veto/Debug/Resources/Exception'
+            __DIR__ . '/../Resources/Exception'
         );
 
         // Render the template

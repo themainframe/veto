@@ -10,7 +10,6 @@
  */
 namespace Veto\Debug\Controller;
 
-use Veto\HTTP\Request;
 use Veto\HTTP\Response;
 use Veto\MVC\AbstractController;
 
@@ -31,7 +30,7 @@ class ContainerDebugController extends AbstractController
 
         // TODO: Improve this mechanic.
         $this->get('templating')->addPath(
-            $this->get('app')->path . '/Veto/Debug/Resources/ContainerDebug'
+            __DIR__ . '/../Resources/ContainerDebug'
         );
 
         // Render the template

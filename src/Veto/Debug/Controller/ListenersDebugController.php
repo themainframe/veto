@@ -30,7 +30,7 @@ class ListenersDebugController extends AbstractController
 
         // TODO: Improve this mechanic.
         $this->get('templating')->addPath(
-            $this->get('app')->path . '/Veto/Debug/Resources/ListenersDebug'
+            __DIR__ . '/../Resources/ListenersDebug'
         );
 
         // Render the template
