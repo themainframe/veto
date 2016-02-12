@@ -30,12 +30,6 @@
             border-radius: 6px;
         }
 
-        span.line {
-            width: 20px;
-            display: inline-block;
-            font-weight: bold;
-        }
-
         span.grey {
             font-family: inherit;
             color: #afafaf;
@@ -64,7 +58,7 @@
             <?php print ($frame['type'] ?: ''); ?>
             <?php print ($frame['function'] ?: ''); ?>()
 
-            <?php if ($frameIndex > 0 && count($trace) > 1) { ?>
+            <?php if (0 === $frameIndex && count($trace) > 1) { ?>
             <br><br><span class="grey">... which was called by...</span>
             <?php } ?>
 
