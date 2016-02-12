@@ -35,22 +35,39 @@ class Hive extends Tree
         $configYAML = file_get_contents($path);
         $config = $parser->parse($configYAML);
 
+        // Process any config import directives
+        $config = $this->processImports($path, $config);
+
+        // Merge the configuration hive with this file
+        $this->merge($config);
+    }
+
+    /**
+     * Process any @import directives that occur at the top-level of the configuration array.
+     *
+     * @param string $basePath The base path used for relative @import directives
+     * @param array $config The configuration array being processed
+     * @return array
+     * @throws ConfigurationException
+     */
+    private function processImports($basePath, array $config)
+    {
         // Process any @import directives
         if (array_key_exists('@import', $config)) {
 
             if (!is_array($config['@import'])) {
                 throw new ConfigurationException(
-                    '@import directives must contain an array of JSON file paths.'
+                    '@import directives must contain an array of configuration file paths.'
                 );
             }
 
             foreach($config['@import'] as $importPath) {
-                $importPath = dirname($path) . '/' . $importPath;
+                $importPath = dirname($basePath) . '/' . $importPath;
 
                 if (!file_exists($importPath)) {
                     throw ConfigurationException::missingImportedFile(
                         $importPath,
-                        $path
+                        $basePath
                     );
                 }
 
@@ -61,7 +78,6 @@ class Hive extends Tree
             unset($config['@import']);
         }
 
-        // Merge the configuration hive with this file
-        $this->merge($config);
+        return $config;
     }
 }
