@@ -26,6 +26,9 @@ class PhpEngine implements EngineInterface
      */
     private $paths;
 
+    /**
+     * PhpEngine constructor.
+     */
     public function __construct()
     {
         $this->paths = array();
