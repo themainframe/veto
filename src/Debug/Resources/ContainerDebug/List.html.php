@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Listeners Debug</title>
+    <title>Container Debug</title>
     <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
     <style type="text/css">
 
@@ -13,13 +13,13 @@
 
         h1 {
             font-weight: bold;
-            margin: 0px 0px 20px 0px;
+            margin: 0 0 20px 0;
             font-size: 200%;
         }
 
         h2 {
             font-size: 120%;
-            margin: 0px 0px 20px 0px;
+            margin: 0 0 20px 0;
         }
 
         div.stack {
@@ -34,16 +34,17 @@
 </head>
 <body>
 <h1>
-    Event Listeners
+    Service Container
 </h1>
 <div class="stack">
-    {% for name, listeners in eventNames %}
-        <strong>{{ name }}</strong><br />
-        &nbsp; --> {{ listeners|length }} listener{{ listeners|length > 1 ? 's' }}
+    <?php foreach ($services as $name => $service) { ?>
+        <strong><?php print $name; ?></strong><br />
+        &nbsp; --> <?php print $service->getClassName(); ?>
         <br /><br />
-    {% else %}
-        <strong>There are no event listeners registered with the dispatcher.</strong>
-    {% endfor %}
+    <?php } ?>
+    <?php if (0 === count($services)) { ?>
+        <strong>There are no services defined within the container.</strong>
+    <?php } ?>
 </div>
 </body>
 </html>

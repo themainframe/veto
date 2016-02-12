@@ -29,12 +29,12 @@ class ContainerDebugController extends AbstractController
         // template path. It is therefore necessary to specify the path here.
 
         // TODO: Improve this mechanic.
-        $this->get('templating')->addPath(
+        $this->get('php_template_engine')->addPath(
             __DIR__ . '/../Resources/ContainerDebug'
         );
 
         // Render the template
-        $response = $this->get('templating')->render('List.twig', array(
+        $response = $this->get('php_template_engine')->render('List.html.php', array(
             'services' => $this->container->getDefinitions()
         ));
 

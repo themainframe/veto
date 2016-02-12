@@ -31,12 +31,12 @@ class ExceptionController extends AbstractController
     {
         // The templates for showing exceptions are outside of the normal application
         // template path. It is therefore necessary to specify the path here.
-        $this->get('templating')->addPath(
+        $this->get('php_template_engine')->addPath(
             __DIR__ . '/../Resources/Exception'
         );
 
         // Render the template
-        $response = $this->get('templating')->render('TextHtml.twig', array(
+        $response = $this->get('php_template_engine')->render('TextHtml.html.php', array(
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
