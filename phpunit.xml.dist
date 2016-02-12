@@ -3,13 +3,13 @@
 <phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="Veto Microframework Test Suite">
-            <directory>tests/Veto/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">src/Veto/</directory>
+            <directory suffix=".php">./src/</directory>
         </whitelist>
     </filter>
 
