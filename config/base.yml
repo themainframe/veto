@@ -16,6 +16,9 @@ routes:
 
 services:
 
+    php_template_engine:
+        class: \Veto\Templating\Engine\PhpEngine
+
     dispatcher:
         class: \Veto\Event\Dispatcher
 
