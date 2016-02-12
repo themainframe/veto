@@ -27,8 +27,6 @@ class ContainerDebugController extends AbstractController
     {
         // The templates for showing exceptions are outside of the normal application
         // template path. It is therefore necessary to specify the path here.
-
-        // TODO: Improve this mechanic.
         $this->get('php_template_engine')->addPath(
             __DIR__ . '/../Resources/ContainerDebug'
         );
