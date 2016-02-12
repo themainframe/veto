@@ -142,4 +142,14 @@ class LayerChain extends AbstractContainerAccessor
 
         return $result;
     }
+
+    /**
+     * Get the layers currently added to this LayerChain, keyed by priority group.
+     *
+     * @return array[]
+     */
+    public function getLayers()
+    {
+        return $this->layers;
+    }
 }

@@ -14,6 +14,13 @@ routes:
         methods:
           - GET
 
+    _layers_debug:
+        url: /_debug/layers
+        controller: controller._layers_debug
+        action: layersDebug
+        methods:
+          - GET
+
 services:
 
     php_template_engine:
@@ -31,4 +38,7 @@ services:
             one_shot: true
         _listeners_debug:
             class: \Veto\Debug\Controller\ListenersDebugController
+            one_shot: true
+        _layers_debug:
+            class: \Veto\Debug\Controller\LayersDebugController
             one_shot: true
