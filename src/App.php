@@ -43,7 +43,7 @@ class App extends AbstractContainerAccessor
         $config = new Hive;
 
         // Load the base configuration
-        $config->load(dirname(__DIR__) . '/../config/base.yml');
+        $config->load(dirname(__DIR__) . '/config/base.yml');
 
         // Read configuration information
         $config->load($configPath);
