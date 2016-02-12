@@ -90,7 +90,7 @@ class Tree implements \ArrayAccess
      */
     public function merge($data)
     {
-        $this->values = array_merge_recursive(
+        $this->values = array_replace_recursive(
             $this->values,
             $data
         );
