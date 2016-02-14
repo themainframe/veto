@@ -1,25 +1,6 @@
-routes:
+parameters:
 
-    _container_debug:
-        url: /_debug/container
-        controller: controller._container_debug
-        action: containerDebug
-        methods:
-          - GET
-
-    _listeners_debug:
-        url: /_debug/listeners
-        controller: controller._listeners_debug
-        action: listenersDebug
-        methods:
-          - GET
-
-    _layers_debug:
-        url: /_debug/layers
-        controller: controller._layers_debug
-        action: layersDebug
-        methods:
-          - GET
+    version: 0.3.0
 
 services:
 
@@ -31,14 +12,5 @@ services:
 
     controller:
         _exception_handler:
-            class: \Veto\Debug\Controller\ExceptionController
-            one_shot: true
-        _container_debug:
-            class: \Veto\Debug\Controller\ContainerDebugController
-            one_shot: true
-        _listeners_debug:
-            class: \Veto\Debug\Controller\ListenersDebugController
-            one_shot: true
-        _layers_debug:
-            class: \Veto\Debug\Controller\LayersDebugController
+            class: \Veto\MVC\Controller\ExceptionController
             one_shot: true

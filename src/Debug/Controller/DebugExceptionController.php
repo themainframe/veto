@@ -17,15 +17,15 @@ use Veto\MVC\AbstractController;
 /**
  * ExceptionController
  *
- * This is the default exception controller that will be called for any exceptions
- * from user code that make it to the kernel.
+ * This is the debug exception controller that will be called for any exceptions
+ * from user code that make it to the kernel while the application is in Debug mode.
  *
  * You can override this by specifying a different class to be used for the
- * controller._exception_handler service.
+ * controller._debug_exception_handler service.
  *
- * @since 0.1
+ * @since 0.3.0
  */
-class ExceptionController extends AbstractController
+class DebugExceptionController extends AbstractController
 {
     public function handleExceptionAction(Request $request, \Exception $exception)
     {

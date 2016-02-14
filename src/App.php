@@ -28,22 +28,31 @@ use Veto\Layer\LayerChainBuilder;
 class App extends AbstractContainerAccessor
 {
     /**
-     * @var string
+     * @var bool Whether or not the application is running in Debug mode
      */
-    public $version = "0.1.1";
+    public $debug = false;
 
     /**
      * Create a new application instance.
      *
-     * @param string $configPath The path to the JSON configuration file.
+     * @param bool $debug A flag indicating whether or not to start the application in Debug mode.
+     * @param string $configPath The path to the configuration file to use.
      */
-    public function __construct($configPath)
+    public function __construct($debug = false, $configPath)
     {
+        // The debug mode flag
+        $this->debug = $debug;
+
         // Create the configuration hive and load the base config
         $config = new Hive;
 
         // Load the base configuration
         $config->load(dirname(__DIR__) . '/config/base.yml');
+
+        // Load the debug configuration if this application will start in Debug mode
+        if ($this->debug) {
+            $config->load(dirname(__DIR__) . '/config/debug.yml');
+        }
 
         // Read configuration information
         $config->load($configPath);
@@ -119,7 +128,7 @@ class App extends AbstractContainerAccessor
             $layerChain = $this->container->get('chain');
             $response = $layerChain->processLayers($request);
 
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
 
             // Invoke the exception controller action method
             $exceptionHandler = $this->container->get('controller._exception_handler');
