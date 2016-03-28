@@ -57,7 +57,7 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
             foreach ($config['routes'] as $routeName => $route) {
                 $this->addRoute(
                     $routeName,
-                    $route['url'],
+                    $route['pattern'],
                     isset($route['methods']) ? $route['methods'] : array(),
                     $route['controller'],
                     $route['action']
