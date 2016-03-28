@@ -14,6 +14,7 @@ use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\HTTP\Request;
 use Veto\HTTP\Response;
+use Veto\Layer\Dispatcher\Exception\DispatcherException;
 use Veto\Layer\InboundLayerInterface;
 
 /**
@@ -36,7 +37,7 @@ class DispatcherLayer extends AbstractContainerAccessor implements InboundLayerI
     /**
      * @param Request $request
      * @return mixed
-     * @throws \RuntimeException
+     * @throws DispatcherException
      */
     public function in(Request $request)
     {
@@ -44,16 +45,18 @@ class DispatcherLayer extends AbstractContainerAccessor implements InboundLayerI
         $controllerSpec = $request->getParameter('_controller');
 
         if (!$controllerSpec) {
-            throw new \RuntimeException('The request was not tagged by a router.', 500);
+            throw DispatcherException::notTagged(
+                $request->getMethod(),
+                $request->getUri() ? $request->getUri()->getPath() : ''
+            );
         }
 
         $controller = $this->container->get($controllerSpec['class']);
 
         if (!method_exists($controller, $controllerSpec['method'])) {
-            throw new \RuntimeException(
-                'The controller action "' . $controllerSpec['method'] .
-                '" does not exist for controller "' .
-                $controllerSpec['class'] . '".'
+            throw DispatcherException::controllerActionDoesNotExist(
+                $controllerSpec['method'],
+                $controllerSpec['class']
             );
         }
 
@@ -86,9 +89,10 @@ class DispatcherLayer extends AbstractContainerAccessor implements InboundLayerI
 
         // By the end of the inbound layer list, a response should have been obtained
         if (!$response instanceof Response) {
-            throw new \RuntimeException(
-                'The controller action method must return a Response type. ' .
-                'The controller returned ' . gettype($response) . '.'
+            throw DispatcherException::controllerActionDidNotReturnResponse(
+                $controllerSpec['method'],
+                $controllerSpec['class'],
+                gettype($response)
             );
         }
 

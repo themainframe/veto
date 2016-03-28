@@ -98,7 +98,7 @@ class DispatcherLayerTest extends \PHPUnit_Framework_TestCase
     /**
      * Test that untagged requests throw an exception when they are dispatched.
      *
-     * @expectedException \RuntimeException
+     * @expectedException \Veto\Layer\Dispatcher\Exception\DispatcherException
      * @expectedExceptionMessageRegExp #The request was not tagged by a router.#
      */
     public function testUntaggedRequestThrowsException()
