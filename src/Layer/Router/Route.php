@@ -102,7 +102,7 @@ class Route
     public function matches(Request $request)
     {
         // Verify that the method is appropriate
-        if (!in_array($request->getMethod(), $this->methods)) {
+        if (count($this->methods) > 0 && !in_array($request->getMethod(), $this->methods)) {
             return false;
         }
 
