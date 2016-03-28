@@ -27,6 +27,13 @@ class Route
     protected $pattern;
 
     /**
+     * Any regex rules to apply to placeholders within $pattern.
+     *
+     * @var string[]
+     */
+    protected $rules;
+
+    /**
      * The name of the route.
      *
      * @var string
@@ -59,14 +66,25 @@ class Route
      *
      * @param string $name The name of the route.
      * @param string $pattern The route pattern string.
-     * @param array $methods The methods that can be used for this route.
+     * @param string[] $rules Any regex rules to apply to placeholders in $pattern.
+     * @param string[] $methods The methods that can be used for this route.
      * @param string $controller The controller that handles the route.
      * @param string $action The action that handles the route.
      */
-    public function __construct($name, $pattern, array $methods, $controller, $action)
+    public function __construct($name, $pattern, array $rules, array $methods, $controller, $action)
     {
+        // Validate the rules
+        foreach ($rules as $parameter => $rule) {
+            if (@preg_match('@' . $rule . '@', null) === false) {
+                throw new \InvalidArgumentException(
+                    sprintf('Rule for parameter %s of route %s is not a valid regex string.', $name, $parameter)
+                );
+            }
+        }
+
         $this->name = $name;
         $this->pattern = $pattern;
+        $this->rules = $rules;
         $this->methods = $methods;
         $this->controller = $controller;
         $this->action = $action;
@@ -93,8 +111,16 @@ class Route
 
         if ($placeholders && isset($placeholders[1])) {
 
+            // Build an array of replacement regexes
+            $replacementRegexes = $targetRegexes = array();
+            foreach ($placeholders[1] as $placeholder) {
+                $targetRegexes[] = '@{[A-Za-z_]+}@';
+                $replacementRegexes[] =
+                    array_key_exists($placeholder, $this->rules) ? '(' . $this->rules[$placeholder] . ')' : '([^/]+)';
+            }
+
             // Convert all {...} blocks into regex groups
-            $pattern = preg_replace('@{[A-Za-z_]+}@', '([^/]+)', $this->pattern);
+            $pattern = preg_replace($targetRegexes, $replacementRegexes, $this->pattern);
 
             // Get the placeholder names
             $placeholders = $placeholders[1];

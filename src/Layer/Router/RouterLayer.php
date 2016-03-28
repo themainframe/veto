@@ -58,6 +58,7 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
                 $this->addRoute(
                     $routeName,
                     $route['pattern'],
+                    isset($route['rules']) ? $route['rules'] : array(),
                     isset($route['methods']) ? $route['methods'] : array(),
                     $route['controller'],
                     $route['action']
@@ -68,11 +69,17 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
 
     /**
      * Add a route with an arbitrary method to the router.
+     *
+     * @param $name
+     * @param $pattern
+     * @param string[] $rules
+     * @param string[] $methods
+     * @param $controller
+     * @param $action
      */
-    public function addRoute($name, $pattern, $methods = array('GET'), $controller, $action)
+    public function addRoute($name, $pattern, array $rules, $methods = array('GET'), $controller, $action)
     {
-        $newRoute = new Route($name, $pattern, $methods, $controller, $action);
-        $this->routes->add($name, $newRoute);
+        $this->routes->add($name, new Route($name, $pattern, $rules, $methods, $controller, $action));
     }
 
     /**
@@ -87,6 +94,9 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
     {
         $tagged = false;
 
+        /**
+         * @var Route $route
+         */
         foreach ($this->routes as $route) {
 
             $placeholders = $route->matches($request);
