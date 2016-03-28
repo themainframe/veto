@@ -11,6 +11,7 @@
 namespace Veto\Layer\Router;
 
 use Veto\Collection\Bag;
+use Veto\Layer\Router\Exception\RouterException;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\Event\Dispatcher;
@@ -124,11 +125,7 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
 
         // If no suitable route was found...
         if (!$tagged) {
-            throw new \Exception(
-                'No route defined for ' . $request->getMethod() . ' ' .
-                $request->getUri()->getPath(),
-                404
-            );
+            throw RouterException::noRouteExists($request->getMethod(), $request->getUri()->getPath());
         }
 
         return $request;
@@ -142,15 +139,12 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
      * @return string
      * @throws \Exception
      */
-    public function generateUrl($routeName, array $parameters)
+    public function generateUrl($routeName, array $parameters = array())
     {
         $route = $this->routes->get($routeName);
 
         if (!($route instanceof Route)) {
-            throw new \Exception(
-                'Cannot generate a URL for non-existent route ' . $routeName,
-                500
-            );
+            throw RouterException::nonExistentRoute($routeName);
         }
 
         return $route->generateUrl($parameters);
