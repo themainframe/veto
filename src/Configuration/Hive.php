@@ -12,7 +12,7 @@ namespace Veto\Configuration;
 
 use Symfony\Component\Yaml\Parser;
 use Veto\Collection\Tree;
-use Veto\Exception\ConfigurationException;
+use Veto\Configuration\Exception\ConfigurationException;
 
 /**
  * Hive

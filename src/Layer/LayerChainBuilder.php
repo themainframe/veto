@@ -12,7 +12,7 @@ namespace Veto\Layer;
 
 use Veto\Configuration\Hive;
 use Veto\DI\Container;
-use Veto\Exception\ConfigurationException;
+use Veto\Configuration\Exception\ConfigurationException;
 
 /**
  * LayerChain Builder

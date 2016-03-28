@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\Exception;
+namespace Veto\Configuration\Exception;
 
 /**
  * ConfigurationException

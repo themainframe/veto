@@ -10,14 +10,13 @@
  */
 namespace Veto\Layer\Router;
 
-use Veto\App;
 use Veto\Collection\Bag;
 use Veto\Configuration\Hive;
 use Veto\DI\AbstractContainerAccessor;
 use Veto\Event\Dispatcher;
 use Veto\HTTP\Request;
 use Veto\Layer\InboundLayerInterface;
-use Veto\Exception\ConfigurationException;
+use Veto\Configuration\Exception\ConfigurationException;
 
 /**
  * RouterLayer
