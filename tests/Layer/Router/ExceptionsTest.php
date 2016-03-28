@@ -21,7 +21,7 @@ class ExceptionsTest extends AbstractRouterTest
     /**
      * Check that an exception is thrown if no route matches.
      *
-     * @expectedException \Exception
+     * @expectedException \Veto\Layer\Router\Exception\RouterException
      * @expectedExceptionMessageRegExp #No route defined for#
      */
     public function testExceptionThrownForNoMatch()
@@ -30,5 +30,17 @@ class ExceptionsTest extends AbstractRouterTest
         $request = $this->buildRequestForMethodAndPath('GET', '/bar');
         $router->addRoute('foo', '/foo', array(), array('GET'), 'class', 'method');
         $router->in($request);
+    }
+
+    /**
+     * Check that an exception is thrown when generating a URL for a non-existent route.
+     *
+     * @expectedException \Veto\Layer\Router\Exception\RouterException
+     * @expectedExceptionMessageRegExp #The route foo does not exist.#
+     */
+    public function testExceptionThrownForNonExistentRoute()
+    {
+        $router = new RouterLayer();
+        $router->generateUrl('foo');
     }
 }
