@@ -53,7 +53,7 @@ class RouterLayer extends AbstractContainerAccessor implements InboundLayerInter
         $this->routes = new Bag();
         $this->dispatcher = $dispatcher;
 
-        if (!is_null($config) && $config->get('routes') && is_array($config['routes'])) {
+        if (!is_null($config) && isset($config['routes']) && is_array($config['routes'])) {
             foreach ($config['routes'] as $routeName => $route) {
                 $this->addRoute(
                     $routeName,

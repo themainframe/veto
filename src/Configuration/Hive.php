@@ -11,7 +11,6 @@
 namespace Veto\Configuration;
 
 use Symfony\Component\Yaml\Parser;
-use Veto\Collection\Tree;
 use Veto\Configuration\Exception\ConfigurationException;
 
 /**
@@ -20,8 +19,10 @@ use Veto\Configuration\Exception\ConfigurationException;
  *
  * @since 0.1
  */
-class Hive extends Tree
+class Hive implements \ArrayAccess
 {
+    private $values = array();
+
     /**
      * Load configuration data from a YAML file.
      *
@@ -40,6 +41,83 @@ class Hive extends Tree
 
         // Merge the configuration hive with this file
         $this->merge($config);
+    }
+
+
+    /**
+     * Merge an array of data into this tree object.
+     * The behaviour is identical to that of array_merge_recursive.
+     *
+     * @param array $data The data to merge into the tree.
+     * @return bool
+     */
+    public function merge($data)
+    {
+        $this->values = array_replace_recursive(
+            $this->values,
+            $data
+        );
+
+        return true;
+    }
+
+    /**
+     * Retrieve the full configuration hive as an array.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->values;
+    }
+
+    /**
+     * Whether a offset exists
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+     * @param mixed $offset
+     * @return boolean true on success or false on failure.
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->values);
+    }
+
+    /**
+     * Offset to retrieve
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
+     * @param mixed $offset
+     * @return mixed Can return all value types.
+     */
+    public function offsetGet($offset)
+    {
+        return $this->values[$offset];
+    }
+
+    /**
+     * Offset to set
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->values[$offset] = $value;
+    }
+
+    /**
+     * Offset to unset
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->values[$offset]);
     }
 
     /**

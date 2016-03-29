@@ -36,41 +36,39 @@ class App extends AbstractContainerAccessor
      * Create a new application instance.
      *
      * @param bool $debug A flag indicating whether or not to start the application in Debug mode.
-     * @param string $configPath The path to the configuration file to use.
+     * @param array $config An Hive instance, or an array of configuration settings for the application.
      */
-    public function __construct($debug = false, $configPath)
+    public function __construct($debug = false, array $config = array())
     {
         // The debug mode flag
         $this->debug = $debug;
-
-        // Create the configuration hive and load the base config
-        $config = new Hive;
-
+        
         // Load the base configuration
-        $config->load(dirname(__DIR__) . '/config/base.yml');
+        $baseConfig = new Hive();
+        $baseConfig->load(dirname(__DIR__) . '/config/base.yml');
 
         // Load the debug configuration if this application will start in Debug mode
         if ($this->debug) {
-            $config->load(dirname(__DIR__) . '/config/debug.yml');
+            $baseConfig->load(dirname(__DIR__) . '/config/debug.yml');
         }
 
-        // Read configuration information
-        $config->load($configPath);
+        // Merge the actual config onto the base config
+        $baseConfig->merge($config);
 
         // Initialise service container
         $this->container = new Container;
 
         // Register the kernel & configuration hive
-        $this->container->defineInstance('config', $config);
+        $this->container->defineInstance('config', $baseConfig);
         $this->container->defineInstance('app', $this);
         $this->container->defineInstance('container', $this->container);
 
         // Register parameters & services
-        $this->registerParameters(isset($config['parameters']) ? $config['parameters'] : array());
-        $this->registerServices(isset($config['services']) ? $config['services'] : array());
+        $this->registerParameters(isset($baseConfig['parameters']) ? $baseConfig['parameters'] : array());
+        $this->registerServices(isset($baseConfig['services']) ? $baseConfig['services'] : array());
 
         // Set up layers
-        $layerChain = LayerChainBuilder::initWithConfigurationAndContainer($config, $this->container);
+        $layerChain = LayerChainBuilder::initWithConfigurationAndContainer($baseConfig, $this->container);
         $this->container->defineInstance('chain', $layerChain);
     }
 
