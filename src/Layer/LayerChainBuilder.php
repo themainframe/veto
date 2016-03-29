@@ -11,7 +11,7 @@
 namespace Veto\Layer;
 
 use Veto\Configuration\Hive;
-use Veto\DI\Container;
+use Veto\DependencyInjection\Container;
 use Veto\Configuration\Exception\ConfigurationException;
 
 /**

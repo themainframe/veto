@@ -10,7 +10,7 @@
  */
 namespace Veto\Layer;
 
-use Veto\HTTP\Response;
+use Veto\Http\Response;
 
 /**
  * OutboundLayerInterface

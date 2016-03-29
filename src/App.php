@@ -11,11 +11,11 @@
 namespace Veto;
 
 use Veto\Configuration\Hive;
-use Veto\DI\AbstractContainerAccessor;
-use Veto\DI\Container;
-use Veto\DI\Definition;
-use Veto\HTTP\Request;
-use Veto\HTTP\Response;
+use Veto\DependencyInjection\AbstractContainerAccessor;
+use Veto\DependencyInjection\Container;
+use Veto\DependencyInjection\Definition;
+use Veto\Http\Request;
+use Veto\Http\Response;
 use Veto\Layer\LayerChainBuilder;
 
 /**

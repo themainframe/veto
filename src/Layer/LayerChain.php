@@ -10,9 +10,9 @@
  */
 namespace Veto\Layer;
 
-use Veto\DI\AbstractContainerAccessor;
-use Veto\HTTP\Request;
-use Veto\HTTP\Response;
+use Veto\DependencyInjection\AbstractContainerAccessor;
+use Veto\Http\Request;
+use Veto\Http\Response;
 
 /**
  * LayerChain

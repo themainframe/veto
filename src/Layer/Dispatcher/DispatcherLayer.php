@@ -10,10 +10,10 @@
  */
 namespace Veto\Layer\Dispatcher;
 
-use Veto\DI\AbstractContainerAccessor;
-use Veto\DI\Container;
-use Veto\HTTP\Request;
-use Veto\HTTP\Response;
+use Veto\DependencyInjection\AbstractContainerAccessor;
+use Veto\DependencyInjection\Container;
+use Veto\Http\Request;
+use Veto\Http\Response;
 use Veto\Layer\Dispatcher\Exception\DispatcherException;
 use Veto\Layer\InboundLayerInterface;
 

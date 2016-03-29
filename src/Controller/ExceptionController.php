@@ -10,8 +10,8 @@
  */
 namespace Veto\MVC\Controller;
 
-use Veto\HTTP\Request;
-use Veto\HTTP\Response;
+use Veto\Http\Request;
+use Veto\Http\Response;
 use Veto\MVC\AbstractController;
 
 /**

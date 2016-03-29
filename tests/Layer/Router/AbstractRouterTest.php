@@ -24,7 +24,7 @@ abstract class AbstractRouterTest extends \PHPUnit_Framework_TestCase
      */
     protected function buildUriFromPathString($path)
     {
-        $stub = $this->getMockBuilder('\Veto\HTTP\Uri')
+        $stub = $this->getMockBuilder('\Veto\Http\Uri')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -43,7 +43,7 @@ abstract class AbstractRouterTest extends \PHPUnit_Framework_TestCase
      */
     protected function buildRequestForMethodAndPath($method, $path)
     {
-        $stub = $this->getMockBuilder('\Veto\HTTP\Request')
+        $stub = $this->getMockBuilder('\Veto\Http\Request')
             ->disableOriginalConstructor()
             ->getMock();
 

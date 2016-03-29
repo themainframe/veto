@@ -13,9 +13,9 @@ namespace Veto\Layer\Router;
 use Veto\Collection\Bag;
 use Veto\Layer\Router\Exception\RouterException;
 use Veto\Configuration\Hive;
-use Veto\DI\AbstractContainerAccessor;
+use Veto\DependencyInjection\AbstractContainerAccessor;
 use Veto\Event\Dispatcher;
-use Veto\HTTP\Request;
+use Veto\Http\Request;
 use Veto\Layer\InboundLayerInterface;
 use Veto\Configuration\Exception\ConfigurationException;
 

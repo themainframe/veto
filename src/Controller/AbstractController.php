@@ -10,8 +10,8 @@
  */
 namespace Veto\MVC;
 
-use Veto\DI\AbstractContainerAccessor;
-use Veto\HTTP\Response;
+use Veto\DependencyInjection\AbstractContainerAccessor;
+use Veto\Http\Response;
 
 /**
  * AbstractController
@@ -22,7 +22,7 @@ use Veto\HTTP\Response;
 abstract class AbstractController extends AbstractContainerAccessor
 {
     /**
-     * @return \Veto\DI\Container
+     * @return \Veto\DependencyInjection\Container
      */
     public function getContainer()
     {

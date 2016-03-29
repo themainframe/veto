@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\HTTP;
+namespace Veto\Http;
 
 use Psr\Http\Message\StreamInterface;
 
@@ -79,7 +79,7 @@ class MessageBody implements StreamInterface
     {
         if (!is_resource($stream)) {
             throw new \InvalidArgumentException(
-                '\Veto\HTTP\Body::__construct() argument must be a PHP stream resource'
+                '\Veto\Http\Body::__construct() argument must be a PHP stream resource'
             );
         }
 
@@ -95,7 +95,7 @@ class MessageBody implements StreamInterface
     {
         if (false === is_resource($stream)) {
             throw new \InvalidArgumentException(
-                '\Veto\HTTP\Body::attach() argument must be a PHP stream resource'
+                '\Veto\Http\Body::attach() argument must be a PHP stream resource'
             );
         }
 

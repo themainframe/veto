@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\HTTP;
+namespace Veto\Http;
 
 use Psr\Http\Message\UriInterface;
 use Veto\Collection\Bag;
@@ -113,7 +113,7 @@ class Uri implements UriInterface
         // Check for valid argument type
         if (!is_string($uri) && !method_exists($uri, '__toString')) {
             throw new \InvalidArgumentException(
-                '\Veto\HTTP\Uri::createFromString() argument must be a string'
+                '\Veto\Http\Uri::createFromString() argument must be a string'
             );
         }
 
