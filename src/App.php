@@ -36,7 +36,7 @@ class App extends AbstractContainerAccessor
      * Create a new application instance.
      *
      * @param bool $debug A flag indicating whether or not to start the application in Debug mode.
-     * @param array $config An Hive instance, or an array of configuration settings for the application.
+     * @param array $config An associative array of configuration settings for the application.
      */
     public function __construct($debug = false, array $config = array())
     {
