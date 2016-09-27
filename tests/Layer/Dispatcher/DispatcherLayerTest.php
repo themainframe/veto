@@ -26,7 +26,7 @@ class DispatcherLayerTest extends \PHPUnit_Framework_TestCase
      */
     private function buildRequestWithControllerSpec($controllerSpec = false)
     {
-        $stub = $this->getMockBuilder('\Veto\HTTP\Request')
+        $stub = $this->getMockBuilder('\Veto\Http\Request')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,7 +46,7 @@ class DispatcherLayerTest extends \PHPUnit_Framework_TestCase
      */
     private function buildResponse()
     {
-        $stub = $this->getMockBuilder('\Veto\HTTP\Response')
+        $stub = $this->getMockBuilder('\Veto\Http\Response')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -63,7 +63,7 @@ class DispatcherLayerTest extends \PHPUnit_Framework_TestCase
      */
     private function buildContainerThatExpectsGet($serviceLocator, $serviceInstance)
     {
-        $stub = $this->getMockBuilder('\Veto\DI\Container')
+        $stub = $this->getMockBuilder('\Veto\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
 

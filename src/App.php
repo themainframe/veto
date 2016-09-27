@@ -11,12 +11,12 @@
 namespace Veto;
 
 use Veto\Configuration\Hive;
-use Veto\DI\AbstractContainerAccessor;
-use Veto\DI\Container;
-use Veto\DI\Definition;
-use Veto\HTTP\Request;
-use Veto\HTTP\RequestStack;
-use Veto\HTTP\Response;
+use Veto\DependencyInjection\AbstractContainerAccessor;
+use Veto\DependencyInjection\Container;
+use Veto\DependencyInjection\Definition;
+use Veto\Http\Request;
+use Veto\Http\Response;
+use Veto\Http\RequestStack;
 use Veto\Layer\LayerChainBuilder;
 
 /**
@@ -42,7 +42,7 @@ class App extends AbstractContainerAccessor
      * Create a new application instance.
      *
      * @param bool $debug A flag indicating whether or not to start the application in Debug mode.
-     * @param array $config An Hive instance, or an array of configuration settings for the application.
+     * @param array $config An associative array of configuration settings for the application.
      */
     public function __construct($debug = false, array $config = array())
     {

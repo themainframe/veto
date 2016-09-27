@@ -9,7 +9,7 @@
  * @package veto
  */
 namespace Veto\Layer\Router;
-use Veto\HTTP\Request;
+use Veto\Http\Request;
 
 /**
  * Route

@@ -9,10 +9,10 @@
  * @package veto
  */
 
-namespace Veto\Tests\HTTP\Uri;
+namespace Veto\Tests\Http\Uri;
 
 use Psr\Http\Message\UriInterface;
-use Veto\HTTP\Uri;
+use Veto\Http\Uri;
 
 /**
  * Tests for creating PSR-7 compliant URI from URI string
@@ -62,7 +62,7 @@ class CreateUriFromStringTest extends AbstractUriTest
     {
         $this->setExpectedException(
             '\InvalidArgumentException',
-            '\Veto\HTTP\Uri::createFromString() argument must be a string'
+            '\Veto\Http\Uri::createFromString() argument must be a string'
         );
 
         Uri::createFromString(new \StdClass);
@@ -74,7 +74,7 @@ class CreateUriFromStringTest extends AbstractUriTest
 
         $this->setExpectedException(
             '\InvalidArgumentException',
-            'Call to \Veto\HTTP\Uri::createFromString() with invalid URI "' . $uri . '"'
+            'Call to \Veto\Http\Uri::createFromString() with invalid URI "' . $uri . '"'
         );
 
         Uri::createFromString($uri);

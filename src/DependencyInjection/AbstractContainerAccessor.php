@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\DI;
+namespace Veto\DependencyInjection;
 
 /**
  * Represents an object that can access a service container.

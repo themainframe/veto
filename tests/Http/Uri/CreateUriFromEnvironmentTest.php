@@ -9,11 +9,11 @@
  * @package veto
  */
 
-namespace Veto\Tests\HTTP\Uri;
+namespace Veto\Tests\Http\Uri;
 
 use Psr\Http\Message\UriInterface;
 use Veto\Collection\Bag;
-use Veto\HTTP\Uri;
+use Veto\Http\Uri;
 
 /**
  * Tests for creating PSR-7 compliant URI from application environment.

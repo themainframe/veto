@@ -9,10 +9,10 @@
  * @package veto
  */
 
-namespace Veto\Tests\HTTP\Uri;
+namespace Veto\Tests\Http\Uri;
 
 
-use Veto\HTTP\Uri;
+use Veto\Http\Uri;
 
 class MutateUriTest extends \PHPUnit_Framework_TestCase
 {

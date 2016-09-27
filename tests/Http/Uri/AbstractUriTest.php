@@ -9,7 +9,7 @@
  * @package veto
  */
 
-namespace Veto\Tests\HTTP\Uri;
+namespace Veto\Tests\Http\Uri;
 
 use Psr\Http\Message\UriInterface;
 

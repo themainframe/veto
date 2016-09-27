@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\HTTP;
+namespace Veto\Http;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;

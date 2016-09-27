@@ -10,7 +10,7 @@
  */
 namespace Veto\Layer;
 
-use Veto\HTTP\Request;
+use Veto\Http\Request;
 
 /**
  * InboundLayerInterface

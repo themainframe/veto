@@ -37,7 +37,7 @@ class DispatcherException extends \RuntimeException
     {
         return new self(
             sprintf(
-                'The controller action method %s for controller %s must return an instance of Veto\\HTTP\\Response. ' .
+                'The controller action method %s for controller %s must return an instance of Veto\\Http\\Response. ' .
                 'A %s was returned instead.',
                 $method,
                 $controller,
