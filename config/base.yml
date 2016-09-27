@@ -12,5 +12,5 @@ services:
 
     controller:
         _exception_handler:
-            class: \Veto\MVC\Controller\ExceptionController
+            class: \Veto\Controller\ExceptionController
             one_shot: true

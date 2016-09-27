@@ -8,7 +8,7 @@
  * @version 0.1
  * @package veto
  */
-namespace Veto\MVC;
+namespace Veto\Controller;
 
 use Veto\DependencyInjection\AbstractContainerAccessor;
 use Veto\Http\Response;

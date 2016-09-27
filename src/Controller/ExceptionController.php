@@ -8,11 +8,11 @@
  * @version 0.3
  * @package veto
  */
-namespace Veto\MVC\Controller;
+namespace Veto\Controller\Controller;
 
 use Veto\Http\Request;
 use Veto\Http\Response;
-use Veto\MVC\AbstractController;
+use Veto\Controller\AbstractController;
 
 /**
  * ExceptionController

@@ -7,7 +7,7 @@ Each action method performs a specific part of your application's functionality.
 ## Writing Controllers
 
 A Veto controller class has no restrictions on inheritance or name. Any class can be used as a controller, however Veto
-provides an abstract class - `Veto\MVC\AbstractController` - with useful functionality that you may wish to extend when writing controller classes.
+provides an abstract class - `Veto\Controller\AbstractController` - with useful functionality that you may wish to extend when writing controller classes.
 
 A controller class might look like this:
 

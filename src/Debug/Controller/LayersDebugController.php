@@ -11,7 +11,7 @@
 namespace Veto\Debug\Controller;
 
 use Veto\Http\Response;
-use Veto\MVC\AbstractController;
+use Veto\Controller\AbstractController;
 
 /**
  * ListenersDebugController
