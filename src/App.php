@@ -15,6 +15,7 @@ use Veto\DI\AbstractContainerAccessor;
 use Veto\DI\Container;
 use Veto\DI\Definition;
 use Veto\HTTP\Request;
+use Veto\HTTP\RequestStack;
 use Veto\HTTP\Response;
 use Veto\Layer\LayerChainBuilder;
 
@@ -31,6 +32,11 @@ class App extends AbstractContainerAccessor
      * @var bool Whether or not the application is running in Debug mode
      */
     public $debug = false;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack = null;
 
     /**
      * Create a new application instance.
@@ -62,6 +68,10 @@ class App extends AbstractContainerAccessor
         $this->container->defineInstance('config', $baseConfig);
         $this->container->defineInstance('app', $this);
         $this->container->defineInstance('container', $this->container);
+
+        // Create the request stack and register it with the container
+        $this->requestStack = new RequestStack;
+        $this->container->defineInstance('request_stack', $this->requestStack);
 
         // Register parameters & services
         $this->registerParameters(isset($baseConfig['parameters']) ? $baseConfig['parameters'] : array());
@@ -120,11 +130,14 @@ class App extends AbstractContainerAccessor
      */
     public function handle(Request $request)
     {
+        $this->requestStack->push($request);
+
         try {
 
             // TODO: Not keen on this, need to find a way to avoid referencing the chain service, tags?
             $layerChain = $this->container->get('chain');
             $response = $layerChain->processLayers($request);
+            $this->requestStack->pop();
 
         } catch (\Exception $exception) {
 
